@@ -8,7 +8,7 @@ import java.util.TimeZone;
 
 public class DBManager {
     public static final String DB = "jdbc:mysql://localhost:3306";
-    public static final String schema = "superprof";    //  "jdbc_schema"
+    public static final String schema = "jdbc_schema";
     public static final String User = "nicola";
     public static final String Pass = "qwertyuio";
     public static final String Time = TimeZone.getDefault().getID();
