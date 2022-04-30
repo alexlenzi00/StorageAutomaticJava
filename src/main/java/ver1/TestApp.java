@@ -7,26 +7,23 @@ public class TestApp {
 
     public static void main(String[] args) {
         // SAVE to csv
-        ArrayList<Studente> init = new ArrayList<>();
-        init.add(new Studente(1, "Alex", "Lenzi"));
-        init.add(new Studente(2, "Nicola", "Bicocchi"));
         try {
-            Studente.saveToCSV(init, new File("save.csv"));
+            ArrayList<Studente> init = new ArrayList<>();
+            init.add(new Studente(1, "Alex", "Lenzi"));
+            init.add(new Studente(2, "Nicola", "Bicocchi"));
+            Studente.saveToCSV(init, "save.csv");
         } catch (IOException e) {
             System.out.println("Error! Save to CVS failed");
         }
+
+
+
         // LOAD from CSV file
-        ArrayList<Studente> students = new ArrayList<>();
-        String name = "load.csv";
         try {
-            File f = new File(name);
-            if (f.exists()) {
-                students = Storage.loadFromCSV(f, new Studente(), Studente.class);
-            }
-        } catch(IOException e) {
-            System.out.println("Error! Load to CSV failed...");
-            System.out.println(e.getMessage());
+            ArrayList<Studente> students = Storage.loadFromCSV("load.csv", new Studente(), Studente.class);
+            System.out.println(students);
+        } catch (IOException e) {
+            System.out.println("Error! Load from CVS failed");
         }
-        System.out.println(students);
     }
 }

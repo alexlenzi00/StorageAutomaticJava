@@ -97,7 +97,7 @@ public class StudenteUIDesigner extends JFrame {
             if (option == JFileChooser.APPROVE_OPTION) {
                 try {
                     Statement statement = DBManager.getConnection().createStatement();
-                    List<Studente> students = Studente.loadFromCSV(jf.getSelectedFile(), new Studente(), Studente.class);
+                    List<Studente> students = Studente.loadFromCSV(jf.getSelectedFile().getName(), new Studente(), Studente.class);
                     StudenteStorage.saveToDB(students, statement);
                     initData();
                     statement.close();

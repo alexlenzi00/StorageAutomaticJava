@@ -1,6 +1,7 @@
 package ver1;
 
 import org.jetbrains.annotations.*;
+
 import java.io.*;
 import java.lang.reflect.*;
 import java.nio.file.*;
@@ -140,7 +141,8 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull File file) throws IOException {
+    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull String filename) throws IOException {
+        File file = new File(filename);
         Path path = file.toPath();
         List<String> lines = new ArrayList<>();
         for (T data : lst)
@@ -167,5 +169,6 @@ public abstract class Storage implements CSVserializable {
         }
         return ris;
     }
+
     public abstract <T extends Storage> T duplicate(Class<T> c);
 }
