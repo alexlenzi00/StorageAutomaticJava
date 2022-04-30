@@ -112,10 +112,10 @@ public abstract class Storage implements CSVserializable {
                         if (o != null) {
                             f.set(template, o);
                         }
+                        i++;
                         break;
                     }
                 }
-                i++;
             }
             return template;
         } catch (IllegalAccessException e) {

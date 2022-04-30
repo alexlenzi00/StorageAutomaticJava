@@ -11,7 +11,7 @@ public class TestApp {
         init.add(new Studente(1, "Alex", "Lenzi"));
         init.add(new Studente(2, "Nicola", "Bicocchi"));
         try {
-            Studente.saveToCSV(init, new File("test.csv"));
+            Studente.saveToCSV(init, new File("save.csv"));
         } catch (IOException e) {
             System.out.println("Error! Save to CVS failed");
         }

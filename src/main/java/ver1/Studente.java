@@ -29,7 +29,7 @@ public class Studente extends Storage {
 
     public Studente() {
         super(create_db);
-        setForbidden(new ArrayList<>(List.of("create_db")).toArray(new String[0]));
+        setForbidden(new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
         setMap(this);
         setIdStudente(0);
         setNome("");
