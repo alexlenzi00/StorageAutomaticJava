@@ -4,7 +4,6 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class TestApp {
-
     public static void main(String[] args) {
         // SAVE to csv
         try {
@@ -15,9 +14,6 @@ public class TestApp {
         } catch (IOException e) {
             System.out.println("Error! Save to CVS failed");
         }
-
-
-
         // LOAD from CSV file
         try {
             ArrayList<Studente> students = Storage.loadFromCSV("load.csv", new Studente(), Studente.class);
