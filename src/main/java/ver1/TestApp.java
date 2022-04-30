@@ -17,7 +17,7 @@ public class TestApp {
         }
         // LOAD from CSV file
         ArrayList<Studente> students = new ArrayList<>();
-        String name = "test.csv";
+        String name = "load.csv";
         try {
             File f = new File(name);
             if (f.exists()) {
