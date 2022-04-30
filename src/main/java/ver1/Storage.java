@@ -148,20 +148,24 @@ public abstract class Storage implements CSVserializable {
         Files.write(path, lines);
     }
 
-    public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull File file, T template, Class<T> c) throws IOException {
-        ArrayList<T> lst = new ArrayList<>();
-        Path path = file.toPath();
-        Scanner scanner = new Scanner(path);
-        while (scanner.hasNextLine()) {
-            // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
-            template.FromCSV(scanner.nextLine(), template);
-            try {
-                lst.add(template.duplicate(c));
-            } catch (Exception ignored) {
-                System.out.println("Error loadCSV!");
+    public static <T extends Storage> ArrayList<T> loadFromCSV(@NotNull String filename, T template, Class<T> c) throws IOException {
+        ArrayList<T> ris = null;
+        File file = new File(filename);
+        if (file.exists()) {
+            ris = new ArrayList<>();
+            Path path = file.toPath();
+            Scanner scanner = new Scanner(path);
+            while (scanner.hasNextLine()) {
+                // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
+                template.FromCSV(scanner.nextLine(), template);
+                try {
+                    ris.add(template.duplicate(c));
+                } catch (Exception ignored) {
+                    System.out.println("Error loadCSV!");
+                }
             }
         }
-        return lst;
+        return ris;
     }
     public abstract <T extends Storage> T duplicate(Class<T> c);
 }
