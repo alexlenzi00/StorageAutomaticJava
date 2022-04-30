@@ -98,7 +98,7 @@ public class StudenteUIDesigner extends JFrame {
                 try {
                     Statement statement = DBManager.getConnection().createStatement();
                     List<Studente> students = Studente.loadFromCSV(jf.getSelectedFile().getName(), new Studente(), Studente.class);
-                    StudenteStorage.saveToDB(students, statement);
+                    Studente.saveToDB(students, statement, new Studente());
                     initData();
                     statement.close();
                 } catch (IOException | SQLException ex) {

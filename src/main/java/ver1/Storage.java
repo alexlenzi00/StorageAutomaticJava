@@ -58,13 +58,13 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    private String @NotNull [] Keys() {
+    protected String @NotNull [] Keys() {
         Set<String> a = new LinkedHashSet<>(map.keySet());
         String[] tmp = new String[a.size()];
         return a.toArray(tmp);
     }
 
-    private TYPES @NotNull [] Values() {
+    protected TYPES @NotNull [] Values() {
         ArrayList<TYPES> b = new ArrayList<>(map.values());
         TYPES[] tmp = new TYPES[b.size()];
         return b.toArray(tmp);
@@ -118,15 +118,15 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    public <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement) throws SQLException {
-        String name = TYPES.getClassName(this.getClass());
+    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement, T template) throws SQLException {
+        String name = TYPES.getClassName(template.getClass());
         statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
-        statement.executeUpdate(getCreate());
-        String[] k = Keys();
-        TYPES[] v = Values();
+        statement.executeUpdate(template.getCreate());
+        String[] k = template.Keys();
+        TYPES[] v = template.Values();
         for (T s : lst) {
             StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
-            for (int i = 0; i < map.size(); i++) {
+            for (int i = 0; i < s.map.size(); i++) {
                 sql.add(TYPES.howToPrint(s.getByName(k[i]), v[i]));
             }
             statement.executeUpdate(sql.toString());
