@@ -21,7 +21,7 @@ public class TestApp {
         try {
             File f = new File(name);
             if (f.exists()) {
-                students = Storage.loadFromCSV(f, new Studente(0, "",""), Studente.class);
+                students = Storage.loadFromCSV(f, new Studente(), Studente.class);
             }
         } catch(IOException e) {
             System.out.println("Error! Load to CSV failed...");

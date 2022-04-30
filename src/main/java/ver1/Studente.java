@@ -27,6 +27,15 @@ public class Studente extends Storage {
         setCognome(cognome);
     }
 
+    public Studente() {
+        super(create_db);
+        setForbidden(new ArrayList<>(List.of("create_db")).toArray(new String[0]));
+        setMap(this);
+        setIdStudente(0);
+        setNome("");
+        setCognome("");
+    }
+
     public int getIdStudente() {
         return idStudente;
     }
