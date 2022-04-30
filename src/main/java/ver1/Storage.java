@@ -125,12 +125,10 @@ public abstract class Storage implements CSVserializable {
         String[] k = Keys();
         TYPES[] v = Values();
         for (T s : lst) {
-            StringBuilder sql = new StringBuilder();
-            sql.append("INSERT INTO ").append(name).append("VALUES (");
+            StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
             for (int i = 0; i < map.size(); i++) {
-                sql.append(TYPES.howToPrint(s.getByName(k[i]), v[i])).append(" ,");
+                sql.add(TYPES.howToPrint(s.getByName(k[i]), v[i]));
             }
-            sql.append(");");
             statement.executeUpdate(sql.toString());
         }
     }
