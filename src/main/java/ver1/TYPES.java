@@ -56,11 +56,11 @@ public enum TYPES {
         try {
             String g = String.format("get%s", this.getStr());
             String u = String.format("update%s", this.getStr());
-            this.castFun = Field.class.getMethod(g, Object.class);
+            this.castFun = this.wrap.getMethod("valueOf", String.class);
             this.update = ResultSet.class.getMethod(u, String.class, this.getType());
             this.get = ResultSet.class.getMethod(g, String.class);
         }
-        catch (NoSuchMethodException ignored) {}
+        catch (Exception ignored) {}
     }
 
     public static @NotNull String getClassName(@NotNull Class<?> c) {
@@ -95,9 +95,15 @@ public enum TYPES {
         return (t == STRING) ? ("'" + s + "'") : s;
     }
 
-    public static Method howToCast(Class<?> c) {
-        TYPES t = getTYPESByType(c);
-        return (t != null) ? t.castFun : null;
+    public static Object castThis(String str, TYPES t) {
+        try {
+            if (t == STRING) {
+                return str;
+            }
+           return t.castFun.invoke(str,str);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static Method howToUpdate(Class<?> c) {
@@ -112,9 +118,6 @@ public enum TYPES {
 
     @Override
     public String toString() {
-        String tmp = getType().toString();
-        tmp = tmp.substring(tmp.lastIndexOf(' ') + 1);
-        tmp = tmp.substring(tmp.lastIndexOf('.') + 1);
-        return tmp;
+        return str;
     }
 }

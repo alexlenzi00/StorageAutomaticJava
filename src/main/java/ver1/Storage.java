@@ -7,7 +7,7 @@ import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
 
-public abstract class Storage implements CSVserializable {
+public abstract class Storage implements CSVserializable, Duplicable {
     public Map<String, TYPES> map;
     public final String create;
     private ArrayList<String> forbidden;
@@ -106,7 +106,11 @@ public abstract class Storage implements CSVserializable {
                 f.setAccessible(true);
                 for (String name : Keys()) {
                     if (f.getName().equalsIgnoreCase(name)) {
-                        f.set(this, values[i]);
+                        Object o = TYPES.castThis(values[i], map.get(name));
+                        if (o != null) {
+                            f.set(template, o);
+                        }
+                        break;
                     }
                 }
                 i++;
@@ -149,5 +153,10 @@ public abstract class Storage implements CSVserializable {
             lst.add(tmp);
         }
         return lst;
+    }
+
+    public <T extends Storage> Object copy(T src) {
+        try { return src.clone(); }
+        catch (CloneNotSupportedException e) { return null;}
     }
 }
