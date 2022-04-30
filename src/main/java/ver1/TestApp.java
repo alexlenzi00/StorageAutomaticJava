@@ -6,6 +6,15 @@ import java.util.ArrayList;
 public class TestApp {
 
     public static void main(String[] args) {
+        // SAVE to csv
+        ArrayList<Studente> init = new ArrayList<>();
+        init.add(new Studente(1, "Alex", "Lenzi"));
+        init.add(new Studente(2, "Nicola", "Bicocchi"));
+        try {
+            Studente.saveToCSV(init, new File("test.csv"));
+        } catch (IOException e) {
+            System.out.println("Error! Save to CVS failed");
+        }
         // LOAD from CSV file
         ArrayList<Studente> students = new ArrayList<>();
         String name = "test.csv";

@@ -1,7 +1,6 @@
 package ver1;
 
 import org.jetbrains.annotations.*;
-
 import java.io.*;
 import java.lang.reflect.*;
 import java.nio.file.*;
@@ -107,16 +106,13 @@ public abstract class Storage implements CSVserializable {
                 f.setAccessible(true);
                 for (String name : Keys()) {
                     if (f.getName().equalsIgnoreCase(name)) {
-                        Method m = TYPES.howToCast(map.get(name).getType());
-                        if (m != null) {
-                            f.set(template.getByName(name), m.invoke(values[i]));
-                        }
+                        f.set(this, values[i]);
                     }
                 }
                 i++;
             }
             return template;
-        } catch (IllegalAccessException | InvocationTargetException e) { return null; }
+        } catch (IllegalAccessException e) { return null; }
     }
 
     public <T extends Storage> void saveToDB(List<T> lst, Statement statement) throws SQLException {
