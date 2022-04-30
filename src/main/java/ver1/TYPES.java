@@ -1,12 +1,8 @@
 package ver1;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.Time;
+import org.jetbrains.annotations.*;
+import java.lang.reflect.*;
+import java.sql.*;
 
 public enum TYPES {
     INT(int.class, Integer.class,"Int", "%d"),

@@ -1,7 +1,6 @@
 package ver1;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Studente extends Storage {
     private int idStudente;

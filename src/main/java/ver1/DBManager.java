@@ -1,10 +1,7 @@
 package ver1;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.sql.*;
+import java.util.*;
 
 public class DBManager {
     public static final String DB = "jdbc:mysql://localhost:3306";

@@ -2,13 +2,8 @@ package ver1;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.sql.*;
+import java.util.*;
 
 public class StudenteStorage {
     public static List<Studente> loadFromDB(Statement statement) throws SQLException {
