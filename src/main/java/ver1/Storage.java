@@ -7,7 +7,7 @@ import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
 
-public abstract class Storage implements CSVserializable, Duplicable {
+public abstract class Storage implements CSVserializable {
     public Map<String, TYPES> map;
     public final String create;
     private ArrayList<String> forbidden;
@@ -38,7 +38,9 @@ public abstract class Storage implements CSVserializable, Duplicable {
                     ris = f.get(this);
                 }
             return ris;
-        } catch (IllegalAccessException ignored) { return null; }
+        } catch (IllegalAccessException ignored) {
+            return null;
+        }
     }
 
     protected void setForbidden(String[] str) {
@@ -51,7 +53,7 @@ public abstract class Storage implements CSVserializable, Duplicable {
         }
     }
 
-    protected <T extends Storage> void setMap(T obj) {
+    protected <T extends Storage> void setMap(@NotNull T obj) {
         map = new LinkedHashMap<>();
         Field[] fs = obj.getClass().getDeclaredFields();
         for (Field f : fs) {
@@ -97,7 +99,7 @@ public abstract class Storage implements CSVserializable, Duplicable {
     }
 
     @Override
-    public <T extends Storage> T FromCSV(String csv, T template) {
+    public <T extends Storage> T FromCSV(@NotNull String csv, @NotNull T template) {
         Field[] fs = template.getClass().getDeclaredFields();
         String[] values = csv.split(";");
         int i = 0;
@@ -116,10 +118,12 @@ public abstract class Storage implements CSVserializable, Duplicable {
                 i++;
             }
             return template;
-        } catch (IllegalAccessException e) { return null; }
+        } catch (IllegalAccessException e) {
+            return null;
+        }
     }
 
-    public <T extends Storage> void saveToDB(List<T> lst, Statement statement) throws SQLException {
+    public <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement) throws SQLException {
         String name = TYPES.getClassName(this.getClass());
         statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
         statement.executeUpdate(getCreate());
@@ -136,7 +140,7 @@ public abstract class Storage implements CSVserializable, Duplicable {
         }
     }
 
-    public static <T extends Storage> void saveToCSV(List<T> lst, File file) throws IOException {
+    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull File file) throws IOException {
         Path path = file.toPath();
         List<String> lines = new ArrayList<>();
         for (T data : lst)
@@ -144,19 +148,20 @@ public abstract class Storage implements CSVserializable, Duplicable {
         Files.write(path, lines);
     }
 
-    public static <T extends Storage> List<T> loadFromCSV(File file, T template) throws IOException {
+    public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull File file, T template, Class<T> c) throws IOException {
         ArrayList<T> lst = new ArrayList<>();
         Path path = file.toPath();
         Scanner scanner = new Scanner(path);
         while (scanner.hasNextLine()) {
-            T tmp = template.FromCSV(scanner.nextLine(), template);
-            lst.add(tmp);
+            // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
+            template.FromCSV(scanner.nextLine(), template);
+            try {
+                lst.add(template.duplicate(c));
+            } catch (Exception ignored) {
+                System.out.println("Error loadCSV!");
+            }
         }
         return lst;
     }
-
-    public <T extends Storage> Object copy(T src) {
-        try { return src.clone(); }
-        catch (CloneNotSupportedException e) { return null;}
-    }
+    public abstract <T extends Storage> T duplicate(Class<T> c);
 }

@@ -7,8 +7,8 @@ public class Studente extends Storage {
     private String nome;
     private String cognome;
     private static int id = 1;
-    private static final String create_db = "CREATE TABLE IF NOT EXISTS Studente(IdStudente INT AUTO_INCREMENT, Nome " +
-            "VARCHAR (20) NOT NULL,Cognome VARCHAR(20) NOT NULL,PRIMARY KEY(IdStudente));";
+    private static final String create_db = "CREATE TABLE IF NOT EXISTS Studente(IdStudente INT AUTO_INCREMENT, Nome " + "VARCHAR (20) NOT NULL,Cognome VARCHAR(20) NOT NULL,PRIMARY KEY(IdStudente));";
+
     public Studente(int idStudente, String nome, String cognome) {
         super(create_db);
         setForbidden(new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
@@ -54,5 +54,9 @@ public class Studente extends Storage {
     @Override
     public String toString() {
         return "S { " + idStudente + ", nome='" + nome + "', cognome='" + cognome + "' }";
+    }
+
+    public <T extends Storage> T duplicate(Class<T> c) {
+        return c.cast(new Studente(this.idStudente, this.nome, this.cognome));
     }
 }
