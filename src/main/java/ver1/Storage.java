@@ -13,12 +13,6 @@ public abstract class Storage implements CSVserializable {
     public final String create;
     private ArrayList<String> forbidden;
 
-    protected Storage(String create) {
-        this.create = create;
-        this.forbidden = new ArrayList<>();
-        setForbidden(null);
-    }
-
     protected Storage(String create, String[] str) {
         this.create = create;
         this.forbidden = new ArrayList<>();

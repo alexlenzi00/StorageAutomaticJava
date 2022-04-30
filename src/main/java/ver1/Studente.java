@@ -10,8 +10,7 @@ public class Studente extends Storage {
     private static final String create_db = "CREATE TABLE IF NOT EXISTS Studente(IdStudente INT AUTO_INCREMENT, Nome " + "VARCHAR (20) NOT NULL,Cognome VARCHAR(20) NOT NULL,PRIMARY KEY(IdStudente));";
 
     public Studente(int idStudente, String nome, String cognome) {
-        super(create_db);
-        setForbidden(new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
+        super(create_db, new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
         setMap(this);
         setIdStudente(idStudente);
         setNome(nome);
@@ -19,8 +18,7 @@ public class Studente extends Storage {
     }
 
     public Studente(String nome, String cognome) {
-        super(create_db);
-        setForbidden(new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
+        super(create_db, new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
         setMap(this);
         setIdStudente(id++);
         setNome(nome);
@@ -28,8 +26,7 @@ public class Studente extends Storage {
     }
 
     public Studente() {
-        super(create_db);
-        setForbidden(new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
+        super(create_db, new ArrayList<>(List.of("id", "create_db")).toArray(new String[0]));
         setMap(this);
         setIdStudente(0);
         setNome("");
