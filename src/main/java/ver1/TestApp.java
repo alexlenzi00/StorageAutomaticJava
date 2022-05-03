@@ -46,7 +46,7 @@ public class TestApp {
         }
 
         // DB MODEL
-        try{
+        try {
             ResultSet rs = Studente.getAll("Studente");
             System.out.println(rs);
         }

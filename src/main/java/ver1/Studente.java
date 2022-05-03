@@ -1,8 +1,6 @@
 package ver1;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
+import org.jetbrains.annotations.*;
 
 public class Studente extends Storage {
     private int idStudente;
@@ -61,10 +59,10 @@ public class Studente extends Storage {
 
     @Override
     public String toString() {
-        return "S { " + idStudente + ", nome='" + nome + "', cognome='" + cognome + "' }";
+        return String.format("S { %d, nome='%s', cognome='%s' }", idStudente, nome, cognome);
     }
 
     public <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c) {
-        return c.cast(new Studente(this.idStudente, this.nome, this.cognome));
+        return c.cast(new Studente(this.getIdStudente(), this.getNome(), this.getCognome()));
     }
 }
