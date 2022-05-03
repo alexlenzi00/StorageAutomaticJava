@@ -18,7 +18,7 @@ public class TestApp {
         // LOAD from CSV
         try {
             ArrayList<Studente> students = Storage.loadFromCSV("load.csv", new Studente(), Studente.class);
-            //System.out.println(students);
+            System.out.println(students);
         } catch (IOException e) {
             System.out.println("Error! Load from CSV failed");
         }
@@ -44,5 +44,15 @@ public class TestApp {
         } catch (SQLException e) {
             System.out.println("Error! Save to DB failed");
         }
+
+        // DB MODEL
+        try{
+            ResultSet rs = Studente.getAll("Studente");
+            System.out.println(rs);
+        }
+        catch (SQLException e) {
+            System.out.println("Error! GET ALL failed");
+        }
+
     }
 }

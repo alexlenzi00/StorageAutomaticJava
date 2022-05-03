@@ -1,6 +1,8 @@
 package ver1;
 
+import org.jetbrains.annotations.*;
+
 public interface CSVserializable {
-    String toCSV();
-    <T extends Storage>  T FromCSV(String csv, T template);
+    @NotNull String toCSV();
+    <T extends Storage> T FromCSV(@NotNull String csv, @NotNull T template);
 }

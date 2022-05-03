@@ -1,5 +1,7 @@
 package ver1;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 public class Studente extends Storage {
@@ -37,11 +39,11 @@ public class Studente extends Storage {
         return idStudente;
     }
 
-    public String getNome() {
+    public @NotNull String getNome() {
         return nome;
     }
 
-    public String getCognome() {
+    public @NotNull String getCognome() {
         return cognome;
     }
 
@@ -49,11 +51,11 @@ public class Studente extends Storage {
         this.idStudente = idStudente;
     }
 
-    private void setNome(String nome) {
+    private void setNome(@NotNull String nome) {
         this.nome = nome;
     }
 
-    private void setCognome(String cognome) {
+    private void setCognome(@NotNull String cognome) {
         this.cognome = cognome;
     }
 
@@ -62,7 +64,7 @@ public class Studente extends Storage {
         return "S { " + idStudente + ", nome='" + nome + "', cognome='" + cognome + "' }";
     }
 
-    public <T extends Storage> T duplicate(Class<T> c) {
+    public <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c) {
         return c.cast(new Studente(this.idStudente, this.nome, this.cognome));
     }
 }
