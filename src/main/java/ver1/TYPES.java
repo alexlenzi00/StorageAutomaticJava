@@ -58,12 +58,7 @@ public enum TYPES {
             String u = String.format("update%s", this.getStr());
             this.castFun = this.wrap.getMethod("valueOf", String.class);
             this.update = ResultSet.class.getMethod(u, String.class, this.getType());
-            if (this.type == String.class) {
-                this.get = ResultSet.class.getMethod("getString", int.class);
-            }
-            else {
-                this.get = ResultSet.class.getMethod(g, int.class);
-            }
+            this.get = ResultSet.class.getMethod(g, int.class);
         }
         catch (Exception ignored) {}
     }
