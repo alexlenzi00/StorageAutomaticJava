@@ -9,8 +9,8 @@ import java.sql.*;
 import java.util.*;
 
 public abstract class Storage implements CSVserializable {
-    public Map<String, TYPES> map;
-    public final String create;
+    protected Map<String, TYPES> map;
+    private final String create;
     private ArrayList<String> forbidden;
     private static Map<String, ResultSet> ResultSets;
 
