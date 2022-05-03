@@ -96,6 +96,9 @@ public enum TYPES {
 
     public static Method howToUpdate(Class<?> c) {
         TYPES t = getTYPESByType(c);
+        if (t == null) {
+            t = getTYPESByWrap(c);
+        }
         return (t != null) ? t.update: null;
     }
 
