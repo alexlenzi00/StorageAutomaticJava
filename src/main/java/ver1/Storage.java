@@ -14,7 +14,7 @@ public abstract class Storage implements CSVserializable {
     private ArrayList<String> forbidden;
     private static Map<String, ResultSet> ResultSets;
 
-    protected Storage(@NotNull String create, String ... str) {
+    protected Storage(@NotNull String create, String... str) {
         this.create = create;
         this.forbidden = new ArrayList<>();
         setForbidden(str);
@@ -39,7 +39,7 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    private void setForbidden(String ... str) {
+    private void setForbidden(String... str) {
         this.forbidden = new ArrayList<>();
         forbidden.add("forbidden");
         forbidden.add("map");
@@ -48,7 +48,9 @@ public abstract class Storage implements CSVserializable {
         if (str != null) {
             forbidden.addAll(Arrays.asList(str));
         }
-        ResultSets = new LinkedHashMap<>();
+        if (ResultSets == null) {
+            ResultSets = new LinkedHashMap<>();
+        }
     }
 
     protected <T extends Storage> void init(@NotNull T obj) {

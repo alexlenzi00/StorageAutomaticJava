@@ -5,20 +5,19 @@ import java.lang.reflect.*;
 import java.sql.*;
 
 public enum TYPES {
-    INT(int.class, Integer.class,"Int", "%d"),
-    BYTE(byte.class,Byte.class, "Byte", "%hhd"),
-    LONG(long.class, Long.class, "Long", "%ld"),
+    INT(int.class, Integer.class,"Int"),
+    BYTE(byte.class,Byte.class, "Byte"),
+    LONG(long.class, Long.class, "Long"),
     DATE(Date.class, Date.class, "Date"),
     TIME(Time.class, Time.class, "Time"),
-    SHORT(short.class, Short.class, "Short", "%hd"),
-    FLOAT(float.class, Float.class, "Float", "%f"),
+    SHORT(short.class, Short.class, "Short"),
+    FLOAT(float.class, Float.class, "Float"),
     BOOL(boolean.class, Boolean.class, "Boolean"),
-    STRING(String.class, String.class, "String", "%s"),
-    DOUBLE(double.class, Double.class, "Double", "%lf");
+    STRING(String.class, String.class, "String"),
+    DOUBLE(double.class, Double.class, "Double");
     private final Class<?> type;
     private final Class<?> wrap;
     private final String str;
-    private String print = null;
     private Method castFun;
     private Method update;
     private Method get;
@@ -26,13 +25,6 @@ public enum TYPES {
         this.type = type;
         this.wrap = wrap;
         this.str = str;
-        setMethods();
-    }
-    TYPES(Class<?> type, Class<?> wrap, String str, String print) {
-        this.type = type;
-        this.wrap = wrap;
-        this.str = str;
-        this.print = print;
         setMethods();
     }
 
@@ -46,10 +38,6 @@ public enum TYPES {
 
     public String getStr() {
         return str;
-    }
-
-    public String getPrint() {
-        return print;
     }
 
     private void setMethods () {
@@ -113,6 +101,9 @@ public enum TYPES {
 
     public static Method howToGet(Class<?> c) {
         TYPES t = getTYPESByType(c);
+        if (t == null) {
+            t = getTYPESByWrap(c);
+        }
         return (t != null) ? t.get : null;
     }
 
