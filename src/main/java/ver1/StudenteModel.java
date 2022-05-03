@@ -6,7 +6,7 @@ public class StudenteModel {
     ResultSet students;
 
     public StudenteModel(Statement statement) throws SQLException {
-        students = statement.executeQuery("SELECT * from Studente ORDER BY IdStudente");
+        students = statement.executeQuery("SELECT * from Studente");
         students.first();
     }
 

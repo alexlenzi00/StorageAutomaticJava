@@ -22,6 +22,10 @@ public class DBManager {
         return connection;
     }
 
+    public static Statement getStatement () throws SQLException {
+        return DBManager.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
+    }
+
     public static void close() throws SQLException {
         if (connection != null) {
             connection.close();

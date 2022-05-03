@@ -13,7 +13,7 @@ public abstract class Storage implements CSVserializable {
     public final String create;
     private ArrayList<String> forbidden;
 
-    protected Storage(String create, String[] str) {
+    protected Storage(String create, @NotNull String ... str) {
         this.create = create;
         this.forbidden = new ArrayList<>();
         setForbidden(str);
@@ -38,23 +38,32 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    protected void setForbidden(String[] str) {
+    protected void setForbidden(@NotNull String ... str) {
         this.forbidden = new ArrayList<>();
         forbidden.add("forbidden");
         forbidden.add("map");
         forbidden.add("create");
+        forbidden.add("RSet");
         if (str != null) {
             forbidden.addAll(Arrays.asList(str));
         }
     }
 
-    protected <T extends Storage> void setMap(@NotNull T obj) {
+    protected <T extends Storage> void init(@NotNull T obj) {
         map = new LinkedHashMap<>();
         Field[] fs = obj.getClass().getDeclaredFields();
         for (Field f : fs) {
             if (!forbidden.contains(f.getName())) {
                 map.put(f.getName(), TYPES.getTYPESByType(f.getType()));
             }
+        }
+        String NAME = TYPES.getClassName(obj.getClass());
+        try {
+            ResultSet rs = getAll(NAME);
+            rs.first();
+        }
+        catch (SQLException e) {
+            System.out.printf("Error! INIT (%s) FAILED%n", NAME);
         }
     }
 
@@ -84,15 +93,9 @@ public abstract class Storage implements CSVserializable {
         return ris.toString();
     }
 
-    @Override
-    public String toCSV() {
-        StringJoiner sj = new StringJoiner(";");
-        for (String name : Keys()) {
-            sj.add(getByName(name).toString());
-        }
-        return sj.toString();
-    }
+    public abstract <T extends Storage> T duplicate(Class<T> c);
 
+    // CSV
     @Override
     public <T extends Storage> T FromCSV(@NotNull String csv, @NotNull T template) {
         Field[] fs = template.getClass().getDeclaredFields();
@@ -118,19 +121,13 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement, T template) throws SQLException {
-        String name = TYPES.getClassName(template.getClass());
-        statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
-        statement.executeUpdate(template.getCreate());
-        String[] k = template.Keys();
-        TYPES[] v = template.Values();
-        for (T s : lst) {
-            StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
-            for (int i = 0; i < s.map.size(); i++) {
-                sql.add(TYPES.howToPrint(s.getByName(k[i]), v[i]));
-            }
-            statement.executeUpdate(sql.toString());
+    @Override
+    public String toCSV() {
+        StringJoiner sj = new StringJoiner(";");
+        for (String name : Keys()) {
+            sj.add(getByName(name).toString());
         }
+        return sj.toString();
     }
 
     public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull String filename) throws IOException {
@@ -160,6 +157,22 @@ public abstract class Storage implements CSVserializable {
             }
         }
         return ris;
+    }
+
+    // DB
+    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement, T template) throws SQLException {
+        String name = TYPES.getClassName(template.getClass());
+        statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
+        statement.executeUpdate(template.getCreate());
+        String[] k = template.Keys();
+        TYPES[] v = template.Values();
+        for (T s : lst) {
+            StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
+            for (int i = 0; i < s.map.size(); i++) {
+                sql.add(TYPES.howToPrint(s.getByName(k[i]), v[i]));
+            }
+            statement.executeUpdate(sql.toString());
+        }
     }
 
     public static <T extends Storage> ArrayList<T> loadFromDB(@NotNull Statement statement, @NotNull T template, @NotNull Class<T> c) throws SQLException {
@@ -198,5 +211,11 @@ public abstract class Storage implements CSVserializable {
         return lst;
     }
 
-    public abstract <T extends Storage> T duplicate(Class<T> c);
+    // ResulSet
+    protected ResultSet getAll(String name) throws SQLException{
+        Statement s = DBManager.getStatement();
+        ResultSet RSet = s.executeQuery(String.format("SELECT * FROM %s", name));
+        RSet.first();
+        return RSet;
+    }
 }
