@@ -142,8 +142,8 @@ public abstract class Storage implements CSVserializable {
         Files.write(path, lines);
     }
 
-    public static <T extends Storage> ArrayList<T> loadFromCSV(@NotNull String filename, T template, Class<T> c) throws IOException {
-        ArrayList<T> ris = null;
+    public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull String filename, @NotNull T template, @NotNull Class<T> c) throws IOException {
+        ArrayList<T> ris = new ArrayList<>();
         File file = new File(filename);
         if (file.exists()) {
             ris = new ArrayList<>();
@@ -160,6 +160,42 @@ public abstract class Storage implements CSVserializable {
             }
         }
         return ris;
+    }
+
+    public static <T extends Storage> ArrayList<T> loadFromDB(@NotNull Statement statement, @NotNull T template, @NotNull Class<T> c) throws SQLException {
+        String name = TYPES.getClassName(template.getClass());
+        ArrayList<T> lst = new ArrayList<>();
+        ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s", name));
+        try {
+            while (rs.next()) {
+                int i = 1;
+                Field[] fs = template.getClass().getDeclaredFields();
+                for (Field f : fs) {
+                    f.setAccessible(true);
+                    for (String k : template.Keys()) {
+                        if (f.getName().equalsIgnoreCase(k)) {
+                            Object value = null;
+                            Method m = TYPES.howToGet(template.map.get(k).getType());
+                            //System.out.printf("%d - M %sEXISTS!%n",i, m != null ? "" : "NOT ");
+                            if (template.map.get(k).getType() == String.class) {
+                                value = rs.getString(i++);
+                            }
+                            if (m != null) {
+                                value = m.invoke(rs, i++);
+                            }
+                            //System.out.println("VALUE = " + value);
+                            f.set(template, value);
+                            break;
+                        }
+                    }
+                }
+                //System.out.println("TEMPLATE = " + template + "\n\n");
+                lst.add(template.duplicate(c));
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            System.out.println("Error! LOAD from DB failed...");
+        }
+        return lst;
     }
 
     public abstract <T extends Storage> T duplicate(Class<T> c);
