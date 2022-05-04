@@ -117,7 +117,6 @@ public class TestApp {
         {
             try {
                 ResultSet rs = Studente.getAll("Studente");
-                rs.getDate(1);
                 rs.first();
             } catch (SQLException e) {
                 System.out.println("Error! GET ALL failed");
