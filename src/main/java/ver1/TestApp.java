@@ -6,88 +6,86 @@ import java.util.ArrayList;
 
 public class TestApp {
     public static void main(String[] args) {
+        Statement s;
+        try {
+            s = DBManager.getStatement();
+        }
+        catch (SQLException e ) {
+            System.out.println("Error! Statement not available");
+            e.printStackTrace();
+            throw new IllegalArgumentException("DEAD MOMENT!");
+        }
         // STUDENTE
+
+        // LISTA INIZIALE
+        ArrayList<Studente> lst1 = new ArrayList<>();
+        lst1.add(new Studente(1, "Alex", "Lenzi"));
+        lst1.add(new Studente(2, "Nicola", "Bicocchi"));
+        lst1.add(new Studente(3, "Francesca", "Caico"));
+        System.out.println("INIT: " + lst1);
+
         // SAVE to CSV
         try {
-            ArrayList<Studente> init = new ArrayList<>();
-            init.add(new Studente(1, "Alex", "Lenzi"));
-            init.add(new Studente(2, "Nicola", "Bicocchi"));
-            Studente.saveToCSV(init, "save.csv");
+            Studente.saveToCSV(lst1, "students.csv");
         } catch (IOException e) {
             System.out.println("Error! Save to CSV failed");
         }
         // LOAD from CSV
         try {
-            ArrayList<Studente> students = Storage.loadFromCSV("load.csv", new Studente(), Studente.class);
-            System.out.println(students);
+            ArrayList<Studente> students = Storage.loadFromCSV("students.csv", new Studente(), Studente.class);
+            System.out.println("CSV: " + students);
         } catch (IOException e) {
             System.out.println("Error! Load from CSV failed");
         }
         // SAVE to DB
         try {
-            Connection c = DBManager.getConnection();
-            Statement s = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ArrayList<Studente> lst = new ArrayList<>();
-            lst.add(new Studente(1, "Alex", "Lenzi"));
-            lst.add(new Studente(2, "Nicola", "Bicocchi"));
-            lst.add(new Studente(3, "Francesca", "Caico"));
-            Storage.saveToDB(lst, s, new Studente());
+            Storage.saveToDB(lst1, s, new Studente());
         } catch (SQLException e) {
             System.out.println("Error! Save to DB failed");
         }
 
         // LOAD from DB
         try {
-            Connection c = DBManager.getConnection();
-            Statement s = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ArrayList<Studente> lst = Storage.loadFromDB(s, new Studente(), Studente.class);
-            System.out.println(lst);
+            ArrayList<Studente> students = Storage.loadFromDB(s, new Studente(), Studente.class);
+            System.out.println("DB: " + students);
         } catch (SQLException e) {
             System.out.println("Error! Save to DB failed");
         }
 
 
         // BOOK
+        ArrayList<Book> lst2 = new ArrayList<>();
+        lst2.add(new Book(1, "Title 1", "Alex Lenzi", 10));
+        lst2.add(new Book(2, "Title 2", "Nicola Bicocchi", 10));
+        lst2.add(new Book(3, "Title 3", "Francesca Caico", 10));
+        System.out.println("INIT: " + lst2);
         // SAVE to CSV
         try {
-            ArrayList<Book> init = new ArrayList<>();
-            init.add(new Book(1, "Title 1", "Alex Lenzi", 10));
-            init.add(new Book(2, "Title 2", "Nicola Bicocchi", 10));
-            init.add(new Book(3, "Title 3", "Francesca Caico", 10));
-            Studente.saveToCSV(init, "books.csv");
+            Studente.saveToCSV(lst2, "books.csv");
         } catch (IOException e) {
             System.out.println("Error! Save to CSV failed");
         }
         // LOAD from CSV
         try {
             ArrayList<Book> books = Storage.loadFromCSV("books.csv", new Book(), Book.class);
-            System.out.println(books);
+            System.out.println("CSV: " + books);
         } catch (IOException e) {
             System.out.println("Error! Load from CSV failed");
         }
         // SAVE to DB
         try {
-            Connection c = DBManager.getConnection();
-            Statement s = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ArrayList<Book> lst = new ArrayList<>();
-            lst.add(new Book(1, "Title 1", "Alex Lenzi", 10));
-            lst.add(new Book(2, "Title 2", "Nicola Bicocchi", 10));
-            lst.add(new Book(3, "Title 3", "Francesca Caico", 10));
-            Storage.saveToDB(lst, s, new Book());
+            Storage.saveToDB(lst2, s, new Book());
         } catch (SQLException e) {
             System.out.println("Error! Save to DB failed");
         }
 
         // LOAD from DB
         try {
-            Connection c = DBManager.getConnection();
-            Statement s = c.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ArrayList<Book> lst = Storage.loadFromDB(s, new Book(), Book.class);
-            System.out.println(lst);
+            ArrayList<Book> books = Storage.loadFromDB(s, new Book(), Book.class);
+            System.out.println("DB: " + books);
         } catch (SQLException e) {
             System.out.println("Error! Save to DB failed");
         }
-
 
 
         // DB MODEL
