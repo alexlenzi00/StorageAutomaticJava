@@ -91,7 +91,7 @@ public class TestApp {
         // DB MODEL
         try {
             ResultSet rs = Studente.getAll("Studente");
-            System.out.println(rs);
+            rs.first();
         }
         catch (SQLException e) {
             System.out.println("Error! GET ALL failed");
