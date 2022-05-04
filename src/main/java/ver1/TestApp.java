@@ -12,8 +12,8 @@ public class TestApp {
         }
         catch (SQLException e ) {
             System.out.println("Error! Statement not available");
-            e.printStackTrace();
-            throw new IllegalArgumentException("DEAD MOMENT!");
+            System.out.println(e.getMessage());
+            throw new IllegalArgumentException("R.I.P.");
         }
         // STUDENTE
 

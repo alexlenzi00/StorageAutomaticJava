@@ -41,10 +41,7 @@ public abstract class Storage implements CSVserializable {
 
     private void setForbidden(String... str) {
         this.forbidden = new ArrayList<>();
-        forbidden.add("forbidden");
         forbidden.add("map");
-        forbidden.add("create");
-        forbidden.add("RSet");
         if (str != null) {
             forbidden.addAll(Arrays.asList(str));
         }
