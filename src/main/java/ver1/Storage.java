@@ -68,7 +68,7 @@ public abstract class Storage implements CSVserializable {
                 ResultSets.put(name, rs);
             }
         } catch (SQLException e) {
-            System.out.printf("Error! INIT (%s) FAILED%n", name);
+            System.out.printf("Error! INIT (%s) FAILED", name);
         }
     }
 
@@ -98,11 +98,9 @@ public abstract class Storage implements CSVserializable {
         return ris.toString();
     }
 
-
     // ABSTRACT METHODS
     public abstract <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c);
-
-    public abstract @NotNull String getCreateDB ();
+    public abstract @NotNull String getCreateDB();
 
     // CSV
     @Override
@@ -193,34 +191,11 @@ public abstract class Storage implements CSVserializable {
             rs.first();
             ResultSets.put(name, rs);
         }
-        try {
-            while (rs.next()) {
-                int i = 1;
-                Field[] fs = template.getClass().getDeclaredFields();
-                for (Field f : fs) {
-                    if (template.map.containsKey(f.getName())) {
-                        f.setAccessible(true);
-                        Object value = null;
-                        Method m = TYPES.howToGet(template.map.get(f.getName()).getType());
-                        //System.out.printf("%d - M %sEXISTS!%n",i, m != null ? "" : "NOT ");
-                        if (template.map.get(f.getName()).getType() == String.class) {
-                            value = rs.getString(i++);
-                        }
-                        else if (template.map.get(f.getName()).getType() == LocalDate.class) {
-                            value = rs.getDate(i++).toLocalDate();
-                        }
-                        if (m != null) {
-                            value = m.invoke(rs, i++);
-                        }
-                        //System.out.println("VALUE = " + value);
-                        f.set(template, value);
-                    }
-                }
-                //System.out.println("TEMPLATE = " + template + "\n\n");
-                lst.add(template.duplicate(c));
+        while (rs.next()) {
+            T selected = getSelected(name, template, c);
+            if (selected != null) {
+                lst.add(selected);
             }
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            System.out.println("Error! LOAD from DB failed...");
         }
         return lst;
     }
@@ -228,5 +203,33 @@ public abstract class Storage implements CSVserializable {
     // ResulSet
     public static ResultSet getAll(@NotNull String name) throws SQLException {
         return ResultSets.get(name);
+    }
+
+    public static <T extends Storage> T getSelected(@NotNull String name, T template, Class<T> c) throws SQLException {
+        try {
+            int i = 1;
+            ResultSet rs = ResultSets.get(name);
+            Field[] fs = template.getClass().getDeclaredFields();
+            for (Field f : fs) {
+                if (template.map.containsKey(f.getName())) {
+                    f.setAccessible(true);
+                    Object value = null;
+                    Method m = TYPES.howToGet(template.map.get(f.getName()).getType());
+                    if (template.map.get(f.getName()).getType() == String.class) {
+                        value = rs.getString(i++);
+                    } else if (template.map.get(f.getName()).getType() == LocalDate.class) {
+                        value = rs.getDate(i++).toLocalDate();
+                    }
+                    if (m != null) {
+                        value = m.invoke(rs, i++);
+                    }
+                    f.set(template, value);
+                }
+            }
+            return template.duplicate(c);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            System.out.printf("Error! GetSelected from (%s) failed...", name);
+        }
+        return null;
     }
 }
