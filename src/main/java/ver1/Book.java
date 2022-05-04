@@ -8,10 +8,8 @@ public class Book extends Storage{
     private String author;
     private int pages;
 
-    private static final String create_db = "CREATE TABLE book (id INTEGER PRIMARY KEY, title VARCHAR(30), author VARCHAR(30), pages INTEGER)";
-
     public Book() {
-        super(create_db, "create_db");
+        super();
         init(this);
         setId(0);
         setTitle("");
@@ -20,7 +18,7 @@ public class Book extends Storage{
     }
 
     public Book(int id, String title, String author, int pages) {
-        super(create_db, "create_db");
+        super();
         init(this);
         setId(id);
         setTitle(title);
@@ -68,5 +66,10 @@ public class Book extends Storage{
     @Override
     public <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c) {
         return c.cast(new Book(this.getId(), this.getTitle(), this.getAuthor(), this.getPages()));
+    }
+
+    @Override
+    public @NotNull String getCreateDB() {
+        return"CREATE TABLE book (id INTEGER PRIMARY KEY, title VARCHAR(30), author VARCHAR(30), pages INTEGER)";
     }
 }

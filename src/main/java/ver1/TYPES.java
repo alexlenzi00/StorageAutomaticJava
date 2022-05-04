@@ -3,6 +3,7 @@ package ver1;
 import org.jetbrains.annotations.*;
 import java.lang.reflect.*;
 import java.sql.*;
+import java.time.LocalDate;
 
 public enum TYPES {
     INT(int.class, Integer.class,"Int"),
@@ -14,6 +15,7 @@ public enum TYPES {
     FLOAT(float.class, Float.class, "Float"),
     BOOL(boolean.class, Boolean.class, "Boolean"),
     STRING(String.class, String.class, "String"),
+    LOCALDATE(LocalDate.class, LocalDate.class, "Date"),
     DOUBLE(double.class, Double.class, "Double");
     private final Class<?> type;
     private final Class<?> wrap;
@@ -44,9 +46,14 @@ public enum TYPES {
         try {
             String g = String.format("get%s", this.getStr());
             String u = String.format("update%s", this.getStr());
-            this.castFun = this.wrap.getMethod("valueOf", String.class);
-            this.update = ResultSet.class.getMethod(u, String.class, this.getType());
-            this.get = ResultSet.class.getMethod(g, int.class);
+            if (this.type == LocalDate.class) {
+                this.castFun = LocalDate.class.getMethod("parse", CharSequence.class);
+            }
+            else {
+                this.castFun = this.wrap.getMethod("valueOf", String.class);
+                this.update = ResultSet.class.getMethod(u, String.class, this.getType());
+                this.get = ResultSet.class.getMethod(g, int.class);
+            }
         }
         catch (Exception ignored) {}
     }

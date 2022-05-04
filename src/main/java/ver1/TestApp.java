@@ -15,8 +15,8 @@ public class TestApp {
             System.out.println(e.getMessage());
             throw new IllegalArgumentException("R.I.P.");
         }
-        // STUDENTE
 
+        // STUDENTE
         // LISTA INIZIALE
         ArrayList<Studente> lst1 = new ArrayList<>();
         lst1.add(new Studente(1, "Alex", "Lenzi"));
@@ -49,11 +49,12 @@ public class TestApp {
             ArrayList<Studente> students = Storage.loadFromDB(s, new Studente(), Studente.class);
             System.out.println("DB: " + students);
         } catch (SQLException e) {
-            System.out.println("Error! Save to DB failed");
+            System.out.println("Error! Load from DB failed");
         }
 
 
         // BOOK
+        // LISTA INIZIALE
         ArrayList<Book> lst2 = new ArrayList<>();
         lst2.add(new Book(1, "Title 1", "Alex Lenzi", 10));
         lst2.add(new Book(2, "Title 2", "Nicola Bicocchi", 10));
@@ -84,13 +85,41 @@ public class TestApp {
             ArrayList<Book> books = Storage.loadFromDB(s, new Book(), Book.class);
             System.out.println("DB: " + books);
         } catch (SQLException e) {
-            System.out.println("Error! Save to DB failed");
+            System.out.println("Error! Load from DB failed");
         }
+
+
+        // PLANE
+        // LISTA OTTENUTA DA DB
+        ArrayList<Plane> lst3 = new ArrayList<>();
+        try {
+            lst3 = Storage.loadFromDB(s, new Plane(), Plane.class);
+            System.out.println("DB: " + lst3);
+        } catch (SQLException e) {
+            System.out.println("Error! Load from DB failed");
+        }
+        // SAVE to CSV
+        try {
+            Studente.saveToCSV(lst3, "planes.csv");
+        } catch (IOException e) {
+            System.out.println("Error! Save to CSV failed");
+        }
+        // LOAD from CSV
+        try {
+            ArrayList<Plane> planes = Storage.loadFromCSV("planes.csv", new Plane(), Plane.class);
+            System.out.println("CSV: " + planes);
+        } catch (IOException e) {
+            System.out.println("Error! Load from CSV failed");
+        }
+
+
+
 
 
         // DB MODEL
         try {
             ResultSet rs = Studente.getAll("Studente");
+            rs.getDate(1);
             rs.first();
         }
         catch (SQLException e) {

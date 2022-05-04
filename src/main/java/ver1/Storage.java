@@ -14,8 +14,8 @@ public abstract class Storage implements CSVserializable {
     private ArrayList<String> forbidden;
     private static Map<String, ResultSet> ResultSets;
 
-    protected Storage(@NotNull String create, String... str) {
-        this.create = create;
+    protected Storage(String... str) {
+        this.create = getCreateDB();
         this.forbidden = new ArrayList<>();
         setForbidden(str);
     }
@@ -97,7 +97,11 @@ public abstract class Storage implements CSVserializable {
         return ris.toString();
     }
 
+
+    // ABSTRACT METHODS
     public abstract <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c);
+
+    public abstract @NotNull String getCreateDB ();
 
     // CSV
     @Override
