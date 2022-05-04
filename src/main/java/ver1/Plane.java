@@ -2,7 +2,6 @@ package ver1;
 
 import org.jetbrains.annotations.*;
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class Plane extends Storage{
     private String uuid;
@@ -84,7 +83,7 @@ public class Plane extends Storage{
 
     @Override
     public String toString() {
-        return String.format("P { %s, nome='%s', length=%.2f, wingspan=%.2f, firstflight=%s, category='%s' }", uuid, name, length, wingspan, firstFlight.toString(), category);
+        return String.format("P { %s, nome='%s', length= %.2f, wingspan= %.2f, firstflight= %s, category='%s' }", uuid, name, length, wingspan, firstFlight.toString(), category);
     }
 
     @Override

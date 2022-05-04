@@ -6,6 +6,7 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.nio.file.*;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
 
 public abstract class Storage implements CSVserializable {
@@ -186,28 +187,33 @@ public abstract class Storage implements CSVserializable {
     public static <T extends Storage> @NotNull ArrayList<T> loadFromDB(@NotNull Statement statement, @NotNull T template, @NotNull Class<T> c) throws SQLException {
         String name = TYPES.getClassName(template.getClass());
         ArrayList<T> lst = new ArrayList<>();
-        ResultSet rs = statement.executeQuery(String.format("SELECT * FROM %s", name));
+        ResultSet rs;
+        if ((rs = ResultSets.get(name)) == null) {
+            rs = statement.executeQuery(String.format("SELECT * FROM %s", name));
+            rs.first();
+            ResultSets.put(name, rs);
+        }
         try {
             while (rs.next()) {
                 int i = 1;
                 Field[] fs = template.getClass().getDeclaredFields();
-                for (String k : template.Keys()) {
-                    for (Field f : fs) {
-                        if (f.getName().equalsIgnoreCase(k)) {
-                            f.setAccessible(true);
-                            Object value = null;
-                            Method m = TYPES.howToGet(template.map.get(k).getType());
-                            //System.out.printf("%d - M %sEXISTS!%n",i, m != null ? "" : "NOT ");
-                            if (template.map.get(k).getType() == String.class) {
-                                value = rs.getString(i++);
-                            }
-                            if (m != null) {
-                                value = m.invoke(rs, i++);
-                            }
-                            //System.out.println("VALUE = " + value);
-                            f.set(template, value);
-                            break;
+                for (Field f : fs) {
+                    if (template.map.containsKey(f.getName())) {
+                        f.setAccessible(true);
+                        Object value = null;
+                        Method m = TYPES.howToGet(template.map.get(f.getName()).getType());
+                        //System.out.printf("%d - M %sEXISTS!%n",i, m != null ? "" : "NOT ");
+                        if (template.map.get(f.getName()).getType() == String.class) {
+                            value = rs.getString(i++);
                         }
+                        else if (template.map.get(f.getName()).getType() == LocalDate.class) {
+                            value = rs.getDate(i++).toLocalDate();
+                        }
+                        if (m != null) {
+                            value = m.invoke(rs, i++);
+                        }
+                        //System.out.println("VALUE = " + value);
+                        f.set(template, value);
                     }
                 }
                 //System.out.println("TEMPLATE = " + template + "\n\n");

@@ -46,14 +46,9 @@ public enum TYPES {
         try {
             String g = String.format("get%s", this.getStr());
             String u = String.format("update%s", this.getStr());
-            if (this.type == LocalDate.class) {
-                this.castFun = LocalDate.class.getMethod("parse", CharSequence.class);
-            }
-            else {
-                this.castFun = this.wrap.getMethod("valueOf", String.class);
-                this.update = ResultSet.class.getMethod(u, String.class, this.getType());
-                this.get = ResultSet.class.getMethod(g, int.class);
-            }
+            this.castFun = this.wrap.getMethod("valueOf", String.class);
+            this.update = ResultSet.class.getMethod(u, String.class, this.getType());
+            this.get = ResultSet.class.getMethod(g, int.class);
         }
         catch (Exception ignored) {}
     }
