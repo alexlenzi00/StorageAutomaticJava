@@ -1,9 +1,10 @@
 package ver1;
 
 import org.jetbrains.annotations.*;
+
 import java.time.LocalDate;
 
-public class Plane extends Storage{
+public class Plane extends Storage {
     private String uuid;
     private String name;
     private double length;
@@ -13,7 +14,6 @@ public class Plane extends Storage{
 
     Plane() {
         super();
-        init(this);
         setUuid("");
         setName("");
         setLength(0);
@@ -24,7 +24,6 @@ public class Plane extends Storage{
 
     Plane(String uuid, String name, double length, double wingspan, LocalDate firstFlight, String category) {
         super();
-        init(this);
         setUuid(uuid);
         setName(name);
         setLength(length);
@@ -33,11 +32,11 @@ public class Plane extends Storage{
         setCategory(category);
     }
 
-    public String getUuid() {
+    public @NotNull String getUuid() {
         return uuid;
     }
 
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
@@ -49,19 +48,19 @@ public class Plane extends Storage{
         return wingspan;
     }
 
-    public LocalDate getFirstFlight() {
+    public @NotNull LocalDate getFirstFlight() {
         return firstFlight;
     }
 
-    public String getCategory() {
+    public @NotNull String getCategory() {
         return category;
     }
 
-    public void setUuid(String uuid) {
+    public void setUuid(@NotNull String uuid) {
         this.uuid = uuid;
     }
 
-    public void setName(String name) {
+    public void setName(@NotNull String name) {
         this.name = name;
     }
 
@@ -73,11 +72,11 @@ public class Plane extends Storage{
         this.wingspan = wingspan;
     }
 
-    public void setFirstFlight(LocalDate firstFlight) {
+    public void setFirstFlight(@NotNull LocalDate firstFlight) {
         this.firstFlight = firstFlight;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(@NotNull String category) {
         this.category = category;
     }
 

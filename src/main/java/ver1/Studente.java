@@ -10,7 +10,6 @@ public class Studente extends Storage {
 
     public Studente() {
         super("id");
-        init(this);
         setIdStudente(0);
         setNome("");
         setCognome("");
@@ -18,7 +17,6 @@ public class Studente extends Storage {
 
     public Studente(String nome, String cognome) {
         super("id");
-        init(this);
         setIdStudente(id++);
         setNome(nome);
         setCognome(cognome);
@@ -26,7 +24,6 @@ public class Studente extends Storage {
 
     public Studente(int idStudente, String nome, String cognome) {
         super("id");
-        init(this);
         setIdStudente(idStudente);
         setNome(nome);
         setCognome(cognome);

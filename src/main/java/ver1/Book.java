@@ -10,7 +10,6 @@ public class Book extends Storage{
 
     public Book() {
         super();
-        init(this);
         setId(0);
         setTitle("");
         setAuthor("");
@@ -19,7 +18,6 @@ public class Book extends Storage{
 
     public Book(int id, String title, String author, int pages) {
         super();
-        init(this);
         setId(id);
         setTitle(title);
         setAuthor(author);
@@ -30,11 +28,11 @@ public class Book extends Storage{
         return id;
     }
 
-    public String getTitle() {
+    public @NotNull String getTitle() {
         return title;
     }
 
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return author;
     }
 
@@ -46,11 +44,11 @@ public class Book extends Storage{
         this.id = id;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(@NotNull String title) {
         this.title = title;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(@NotNull String author) {
         this.author = author;
     }
 
