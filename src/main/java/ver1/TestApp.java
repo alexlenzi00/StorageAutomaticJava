@@ -9,13 +9,11 @@ public class TestApp {
         Statement s;
         try {
             s = DBManager.getStatement();
-        }
-        catch (SQLException e ) {
+        } catch (SQLException e) {
             System.out.println("Error! Statement not available");
             System.out.println(e.getMessage());
             throw new IllegalArgumentException("R.I.P.");
         }
-
         // STUDENTE
         {
             // LISTA INIZIALE
@@ -51,7 +49,6 @@ public class TestApp {
                 System.out.println("Error! Load from DB failed");
             }
         }
-
         // BOOK
         {
             // LISTA INIZIALE
@@ -87,7 +84,6 @@ public class TestApp {
                 System.out.println("Error! Load from DB failed");
             }
         }
-
         // PLANE
         {
             // LISTA OTTENUTA DA DB
@@ -112,7 +108,6 @@ public class TestApp {
                 System.out.println("Error! Load from CSV failed");
             }
         }
-
         // DB MODEL
         {
             try {

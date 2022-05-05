@@ -64,6 +64,6 @@ public class Studente extends Storage {
 
     @Override
     public @NotNull String getCreateDB() {
-        return"CREATE TABLE IF NOT EXISTS Studente(IdStudente INT AUTO_INCREMENT, Nome "+"VARCHAR (20) NOT NULL, Cognome VARCHAR(20) NOT NULL,PRIMARY KEY(IdStudente));";
+        return "CREATE TABLE IF NOT EXISTS Studente(IdStudente INT AUTO_INCREMENT, Nome " + "VARCHAR (20) NOT NULL, Cognome VARCHAR(20) NOT NULL,PRIMARY KEY(IdStudente));";
     }
 }

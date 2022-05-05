@@ -2,7 +2,7 @@ package ver1;
 
 import org.jetbrains.annotations.*;
 
-public class Book extends Storage{
+public class Book extends Storage {
     private int id;
     private String title;
     private String author;
@@ -68,6 +68,6 @@ public class Book extends Storage{
 
     @Override
     public @NotNull String getCreateDB() {
-        return"CREATE TABLE book (id INTEGER PRIMARY KEY, title VARCHAR(30), author VARCHAR(30), pages INTEGER)";
+        return "CREATE TABLE book (id INTEGER PRIMARY KEY, title VARCHAR(30), author VARCHAR(30), pages INTEGER)";
     }
 }
