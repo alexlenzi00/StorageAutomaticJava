@@ -150,75 +150,94 @@ public abstract class Storage implements CSVserializable {
         }
     }
 
-    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull String filename) throws IOException {
+    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, T template, @NotNull String filename) {
+        String name = TYPES.getClassName(template.getClass());
         File file = new File(filename);
         Path path = file.toPath();
         List<String> lines = new ArrayList<>();
         for (T data : lst)
             lines.add(data.toCSV());
-        Files.write(path, lines);
+        try {
+            Files.write(path, lines);
+        } catch (IOException e) {
+            System.out.printf("Error! Save to CSV for %s failed\n", name);
+        }
     }
 
-    public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull String filename, @NotNull T template, @NotNull Class<T> c) throws IOException {
+    public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull String filename, @NotNull T template, @NotNull Class<T> c) {
+        String name = TYPES.getClassName(template.getClass());
         ArrayList<T> ris = new ArrayList<>();
         File file = new File(filename);
         if (file.exists()) {
-            ris = new ArrayList<>();
             Path path = file.toPath();
-            Scanner scanner = new Scanner(path);
-            while (scanner.hasNextLine()) {
-                // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
-                template = template.FromCSV(scanner.nextLine(), template);
-                try {
-                    ris.add(template.duplicate(c));
-                } catch (Exception ignored) {
-                    System.out.println("Error loadCSV!");
+            try {
+                Scanner scanner = new Scanner(path);
+                while (scanner.hasNextLine()) {
+                    // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
+                    template = template.FromCSV(scanner.nextLine(), template);
+                    try {
+                        ris.add(template.duplicate(c));
+                    } catch (Exception ignored) {
+                        System.out.println("Error loadCSV!");
+                    }
                 }
+            } catch (IOException e) {
+                System.out.printf("Error! Load from CSV for %s failed\n", name);
             }
         }
         return ris;
     }
 
     // DB
-    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull Statement statement, @NotNull T template) throws SQLException {
+    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull T template) {
         String name = TYPES.getClassName(template.getClass());
-        statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
-        statement.executeUpdate(template.getCreate(name));
-        String[] k = template.Keys(name);
-        TYPES[] v = template.Values(name);
-        for (T x : lst) {
-            StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
-            for (int i = 0; i < types.get(name).size(); i++) {
-                sql.add(TYPES.howToPrint(x.getByName(k[i]), v[i]));
+        try {
+            Statement statement = DBManager.getStatement();
+            statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
+            statement.executeUpdate(template.getCreate(name));
+            String[] k = template.Keys(name);
+            TYPES[] v = template.Values(name);
+            for (T x : lst) {
+                StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
+                for (int i = 0; i < types.get(name).size(); i++) {
+                    sql.add(TYPES.howToPrint(x.getByName(k[i]), v[i]));
+                }
+                statement.executeUpdate(sql.toString());
             }
-            statement.executeUpdate(sql.toString());
+        } catch (SQLException e) {
+            System.out.printf("Error! Save to DB for %s failed\n", name);
         }
     }
 
-    public static <T extends Storage> @NotNull ArrayList<T> loadFromDB(@NotNull Statement statement, @NotNull T template, @NotNull Class<T> c) throws SQLException {
+    public static <T extends Storage> ArrayList<T> loadFromDB(@NotNull T template, @NotNull Class<T> c) {
         String name = TYPES.getClassName(template.getClass());
         ArrayList<T> lst = new ArrayList<>();
-        ResultSet rs = getAll(name);
-        rs.beforeFirst();
-        while (rs.next()) {
-            T selected = getSelected(name, template, c);
-            if (selected != null) {
-                lst.add(selected);
+        try {
+            ResultSet rs = getAll(name);
+            rs.beforeFirst();
+            while (rs.next()) {
+                T selected = getSelected(name, template, c);
+                if (selected != null) {
+                    lst.add(selected);
+                }
             }
+        } catch (SQLException e) {
+            System.out.printf("Error! Load from DB for %s failed\n", name);
         }
         return lst;
     }
 
     // ResulSet
-    public static @NotNull ResultSet getAll(@NotNull String name) throws SQLException {
-        if (!ResultSets.containsKey(name)) {
-            ResultSet rs = DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name));
-            ResultSets.put(name, rs);
+    public static @NotNull ResultSet getAll(@NotNull String name) {
+        try {
+            ResultSets.put(name, DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name)));
+        } catch (SQLException e) {
+            System.out.printf("Error! GET ALL for %s failed\n", name);
         }
         return ResultSets.get(name);
     }
 
-    public static <T extends Storage> T getSelected(@NotNull String name, @NotNull T template, @NotNull Class<T> c) throws SQLException {
+    public static <T extends Storage> T getSelected(@NotNull String name, @NotNull T template, @NotNull Class<T> c) {
         try {
             int i = 1;
             ResultSet rs = ResultSets.get(name);
@@ -241,9 +260,15 @@ public abstract class Storage implements CSVserializable {
                 }
             }
             return template.duplicate(c);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            System.out.printf("Error! GetSelected from (%s) failed...", name);
+        } catch (IllegalAccessException | InvocationTargetException | SQLException e) {
+            System.out.printf("Error! GetSelected from (%s) failed...\n", name);
         }
         return null;
+    }
+
+    public static void insert() {
+    }
+
+    public static <T extends Storage> void updateSelected(String name, T value) {
     }
 }

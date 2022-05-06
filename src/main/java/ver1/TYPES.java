@@ -2,8 +2,9 @@ package ver1;
 
 import org.jetbrains.annotations.*;
 import java.lang.reflect.*;
-import java.sql.*;
-import java.time.LocalDate;
+import java.sql.Time;
+import java.sql.Date;
+import java.sql.ResultSet;
 
 public enum TYPES {
     INT(int.class, Integer.class,"Int"),
@@ -15,7 +16,6 @@ public enum TYPES {
     FLOAT(float.class, Float.class, "Float"),
     BOOL(boolean.class, Boolean.class, "Boolean"),
     STRING(String.class, String.class, "String"),
-    LOCALDATE(LocalDate.class, LocalDate.class, "Date"),
     DOUBLE(double.class, Double.class, "Double");
     private final Class<?> type;
     private final Class<?> wrap;
@@ -82,13 +82,16 @@ public enum TYPES {
 
     public static String howToPrint(Object o, TYPES t) {
         String s = t.getWrap().cast(o).toString();
-        return (t == STRING) ? ("'" + s + "'") : s;
+        return (t == STRING || t == DATE) ? ("'" + s + "'") : s;
     }
 
     public static Object castThis(String str, TYPES t) {
         try {
             if (t == STRING) {
                 return str;
+            }
+            else if (t == DATE) {
+                return Date.valueOf(str);
             }
            return t.castFun.invoke(str,str);
         } catch (Exception e) {

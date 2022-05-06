@@ -2,14 +2,14 @@ package ver1;
 
 import org.jetbrains.annotations.*;
 
-import java.time.LocalDate;
+import java.sql.Date;
 
 public class Plane extends Storage {
     private String uuid;
     private String name;
     private double length;
     private double wingspan;
-    private LocalDate firstFlight;
+    private Date firstFlight;
     private String category;
 
     Plane() {
@@ -18,11 +18,11 @@ public class Plane extends Storage {
         setName("");
         setLength(0);
         setWingspan(0);
-        setFirstFlight(LocalDate.now());
+        setFirstFlight(Date.valueOf("1970-01-01"));
         setCategory("");
     }
 
-    Plane(String uuid, String name, double length, double wingspan, LocalDate firstFlight, String category) {
+    Plane(String uuid, String name, double length, double wingspan, Date firstFlight, String category) {
         super();
         setUuid(uuid);
         setName(name);
@@ -48,7 +48,7 @@ public class Plane extends Storage {
         return wingspan;
     }
 
-    public @NotNull LocalDate getFirstFlight() {
+    public @NotNull Date getFirstFlight() {
         return firstFlight;
     }
 
@@ -72,7 +72,7 @@ public class Plane extends Storage {
         this.wingspan = wingspan;
     }
 
-    public void setFirstFlight(@NotNull LocalDate firstFlight) {
+    public void setFirstFlight(@NotNull Date firstFlight) {
         this.firstFlight = firstFlight;
     }
 
@@ -92,6 +92,6 @@ public class Plane extends Storage {
 
     @Override
     public @NotNull String getCreateDB() {
-        return "CREATE TABLE planes (uuid VARCHAR(50) PRIMARY KEY, name VARCHAR(50), length REAL, wingspan REAL, firstFlight DATE, category VARCHAR(50))";
+        return "CREATE TABLE plane (uuid VARCHAR(50) PRIMARY KEY, name VARCHAR(50), length REAL, wingspan REAL, firstFlight DATE, category VARCHAR(50))";
     }
 }

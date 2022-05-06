@@ -98,10 +98,10 @@ public class StudenteUIDesigner extends JFrame {
                 try {
                     Statement statement = DBManager.getConnection().createStatement();
                     List<Studente> students = Studente.loadFromCSV(jf.getSelectedFile().getName(), new Studente(), Studente.class);
-                    Studente.saveToDB(students, statement, new Studente());
+                    Studente.saveToDB(students, new Studente());
                     initData();
                     statement.close();
-                } catch (IOException | SQLException ex) {
+                } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 }
                 update();
