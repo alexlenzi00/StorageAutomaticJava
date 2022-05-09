@@ -213,7 +213,7 @@ public abstract class Storage implements CSVserializable {
         String name = TYPES.getClassName(template.getClass());
         ArrayList<T> lst = new ArrayList<>();
         try {
-            ResultSet rs = getAll(name);
+            ResultSet rs = Storage.getAll(name);
             rs.beforeFirst();
             while (rs.next()) {
                 T selected = getSelected(name, template, c);
@@ -230,9 +230,16 @@ public abstract class Storage implements CSVserializable {
     // ResulSet
     public static @NotNull ResultSet getAll(@NotNull String name) {
         try {
-            ResultSets.put(name, DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name)));
+            int index = 1;
+            ResultSet rs = ResultSets.get(name);
+            if (rs != null) {
+                index = rs.getRow();
+            }
+            rs = DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name));
+            rs.absolute(index);
+            ResultSets.put(name, rs);
         } catch (SQLException e) {
-            System.out.printf("Error! GET ALL for %s failed\n", name);
+            System.out.printf("Error! GetAll for (%s) failed\n", name);
         }
         return ResultSets.get(name);
     }
@@ -240,20 +247,20 @@ public abstract class Storage implements CSVserializable {
     public static <T extends Storage> T getSelected(@NotNull String name, @NotNull T template, @NotNull Class<T> c) {
         try {
             int i = 1;
-            ResultSet rs = ResultSets.get(name);
+            ResultSet rs = Storage.getAll(name);
             Map<String, TYPES> map = Storage.types.get(name);
             Field[] fs = template.getClass().getDeclaredFields();
             for (Field f : fs) {
-                if (map.containsKey(f.getName())) {
-                    f.setAccessible(true);
+                f.setAccessible(true);
+                String n = f.getName();
+                if (map.containsKey(n)) {
                     Object value = null;
-                    Method m = TYPES.howToGet(map.get(f.getName()).getType());
-                    if (map.get(f.getName()).getType() == String.class) {
+                    Method m = TYPES.howToGet(map.get(n));
+                    if (map.get(n) == TYPES.STRING) {
                         value = rs.getString(i++);
-                    } else if (map.get(f.getName()).getType() == LocalDate.class) {
-                        value = rs.getDate(i++).toLocalDate();
-                    }
-                    if (m != null) {
+                    } else if (map.get(n) == TYPES.DATE) {
+                        value = rs.getDate(i++);
+                    } else if (m != null) {
                         value = m.invoke(rs, i++);
                     }
                     f.set(template, value);
@@ -261,14 +268,107 @@ public abstract class Storage implements CSVserializable {
             }
             return template.duplicate(c);
         } catch (IllegalAccessException | InvocationTargetException | SQLException e) {
-            System.out.printf("Error! GetSelected from (%s) failed...\n", name);
+            System.out.printf("Error! GetSelected for (%s) failed...\n", name);
+            return null;
         }
-        return null;
     }
 
-    public static void insert() {
+    public static <T extends Storage> void insert(@NotNull String name, @NotNull T obj) {
+        try {
+            ResultSet rs = Storage.getAll(name);
+            Map<String, TYPES> map = Storage.types.get(name);
+            Field[] fs = obj.getClass().getDeclaredFields();
+            int index = rs.getRow();
+            rs.moveToInsertRow();
+            // ricerca dei vari campi "mappati" in map per il tipo T e utilizzo di update di ResultSet per inserire un nuovo T nel DB
+            for (Field f : fs) {
+                f.setAccessible(true);
+                String n = f.getName();
+                if (map.containsKey(n)) {
+                    Storage.updateSelected(name, n, obj.getByName(n));
+                }
+            }
+            rs.insertRow();
+            rs.absolute(index);
+        } catch (SQLException e) {
+            System.out.printf("Error! Insert for (%s) failed...\n", name);
+        }
     }
 
-    public static <T extends Storage> void updateSelected(String name, T value) {
+    public static void remove(String name) {
+        try {
+            ResultSet rs = Storage.getAll(name);
+            rs.deleteRow();
+            Storage.previous("Studente");
+        } catch (SQLException e) {
+            System.out.printf("Error! Remove for (%s) failed...\n", name);
+        }
+    }
+
+    public static void previous(String name) {
+        ResultSet rs = Storage.getAll(name);
+        try {
+            if (!rs.isFirst()) {
+                rs.previous();
+            } else {
+                Storage.last(name);
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error! Previous for (%s) failed...\n", name);
+        }
+    }
+
+    public static void next(String name) {
+        ResultSet rs = Storage.getAll(name);
+        try {
+            if (!rs.isLast()) {
+                rs.next();
+            } else {
+                Storage.first(name);
+            }
+        } catch (SQLException e) {
+            System.out.printf("Error! Previous for (%s) failed...\n", name);
+        }
+    }
+
+    public static void last(String name) {
+        ResultSet rs = Storage.getAll(name);
+        try {
+            rs.last();
+        } catch (SQLException e) {
+            System.out.printf("Error! Last for (%s) failed...\n", name);
+        }
+    }
+
+    public static void first(String name) {
+        ResultSet rs = Storage.getAll(name);
+        try {
+            rs.first();
+        } catch (SQLException e) {
+            System.out.printf("Error! First for (%s) failed...\n", name);
+        }
+    }
+
+    public static <T extends Storage> void updateSelected(String name, String attribute, Object value) {
+        try {
+            ResultSet rs = Storage.getAll(name);
+            Map<String, TYPES> map = Storage.types.get(name);
+            if (map.containsKey(attribute)) {
+                TYPES t = map.get(attribute);
+                if (t == TYPES.STRING) {
+                    System.out.printf("Attribute = %s\n", attribute);
+                    rs.updateString(attribute, (String) value);
+                } else {
+                    Method m = TYPES.howToUpdate(t);
+                    if (m != null) {
+                        m.invoke(rs, attribute, value);
+                    }
+                }
+            } else {
+                System.out.printf("La classe %s non ha nessun attributo con nome %s...\n", name, attribute);
+            }
+        } catch (SQLException | InvocationTargetException | IllegalAccessException e) {
+            System.out.printf("Error! UpdateSelected for (%s) failed...\n", name);
+        }
     }
 }

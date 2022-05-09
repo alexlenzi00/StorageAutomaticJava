@@ -1,5 +1,6 @@
 package ver1;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class TestApp {
@@ -67,6 +68,20 @@ public class TestApp {
             // LISTA OTTENUTA DA DB
             ArrayList<Plane> lst3 = Storage.loadFromDB(new Plane(), Plane.class);
             System.out.println("DB: " + lst3);
+        }
+
+        // AUTOMATIC MODEL
+        {
+            // INSERT IN DB
+            Storage.insert("Studente", new Studente(10, "Test", "Insert"));
+            Storage.insert("Book", new Book(10, "Title insert", "Storage", 5));
+            Storage.insert("Plane", new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
+
+            Studente s1 = Storage.getSelected("Studente", new Studente(), Studente.class);
+            Storage.next("Studente");
+            Studente s2 = Storage.getSelected("Studente", new Studente(), Studente.class);
+            System.out.println(s1);
+            System.out.println(s2);
         }
     }
 }

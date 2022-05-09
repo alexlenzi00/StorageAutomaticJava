@@ -1,14 +1,15 @@
 package ver1;
 
 import org.jetbrains.annotations.*;
+
 import java.lang.reflect.*;
 import java.sql.Time;
 import java.sql.Date;
 import java.sql.ResultSet;
 
 public enum TYPES {
-    INT(int.class, Integer.class,"Int"),
-    BYTE(byte.class,Byte.class, "Byte"),
+    INT(int.class, Integer.class, "Int"),
+    BYTE(byte.class, Byte.class, "Byte"),
     LONG(long.class, Long.class, "Long"),
     DATE(Date.class, Date.class, "Date"),
     TIME(Time.class, Time.class, "Time"),
@@ -23,6 +24,7 @@ public enum TYPES {
     private Method castFun;
     private Method update;
     private Method get;
+
     TYPES(Class<?> type, Class<?> wrap, String str) {
         this.type = type;
         this.wrap = wrap;
@@ -42,15 +44,15 @@ public enum TYPES {
         return str;
     }
 
-    private void setMethods () {
+    private void setMethods() {
         try {
             String g = String.format("get%s", this.getStr());
             String u = String.format("update%s", this.getStr());
             this.castFun = this.wrap.getMethod("valueOf", String.class);
             this.update = ResultSet.class.getMethod(u, String.class, this.getType());
             this.get = ResultSet.class.getMethod(g, int.class);
+        } catch (Exception ignored) {
         }
-        catch (Exception ignored) {}
     }
 
     public static @NotNull String getClassName(@NotNull Class<?> c) {
@@ -60,20 +62,20 @@ public enum TYPES {
         return tmp;
     }
 
-    public static TYPES getTYPESByType (Class<?> c) {
+    public static TYPES getTYPESByType(Class<?> c) {
         TYPES[] ts = TYPES.class.getEnumConstants();
-        for (TYPES t: ts){
-            if (t.getType() == c){
+        for (TYPES t : ts) {
+            if (t.getType() == c) {
                 return t;
             }
         }
         return null;
     }
 
-    public static TYPES getTYPESByWrap (Class<?> c) {
+    public static TYPES getTYPESByWrap(Class<?> c) {
         TYPES[] ts = TYPES.class.getEnumConstants();
-        for (TYPES t: ts){
-            if (t.getWrap() == c){
+        for (TYPES t : ts) {
+            if (t.getWrap() == c) {
                 return t;
             }
         }
@@ -89,29 +91,20 @@ public enum TYPES {
         try {
             if (t == STRING) {
                 return str;
-            }
-            else if (t == DATE) {
+            } else if (t == DATE) {
                 return Date.valueOf(str);
             }
-           return t.castFun.invoke(str,str);
+            return t.castFun.invoke(str, str);
         } catch (Exception e) {
             return null;
         }
     }
 
-    public static Method howToUpdate(Class<?> c) {
-        TYPES t = getTYPESByType(c);
-        if (t == null) {
-            t = getTYPESByWrap(c);
-        }
-        return (t != null) ? t.update: null;
+    public static Method howToUpdate(TYPES t) {
+        return (t != null) ? t.update : null;
     }
 
-    public static Method howToGet(Class<?> c) {
-        TYPES t = getTYPESByType(c);
-        if (t == null) {
-            t = getTYPESByWrap(c);
-        }
+    public static Method howToGet(TYPES t) {
         return (t != null) ? t.get : null;
     }
 
