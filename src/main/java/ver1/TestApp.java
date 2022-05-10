@@ -1,7 +1,11 @@
 package ver1;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class TestApp {
     public static void main(String[] args) {
@@ -77,11 +81,13 @@ public class TestApp {
             Storage.insert("Book", new Book(10, "Title insert", "Storage", 5));
             Storage.insert("Plane", new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
 
-            Studente s1 = Storage.getSelected("Studente", new Studente(), Studente.class);
-            Storage.next("Studente");
-            Studente s2 = Storage.getSelected("Studente", new Studente(), Studente.class);
-            System.out.println(s1);
-            System.out.println(s2);
+            // GET SELECTED IN DB
+            Studente s1 = Storage.getSelected(new Studente(), Studente.class);
+            Book b1 = Storage.getSelected(new Book(), Book.class);
+            Plane p1 = Storage.getSelected(new Plane(), Plane.class);
+            System.out.println("STUDENTE: " + s1);
+            System.out.println("BOOK: " + b1);
+            System.out.println("PLANE: " + p1);
         }
     }
 }

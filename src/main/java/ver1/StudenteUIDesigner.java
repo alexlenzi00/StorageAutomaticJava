@@ -79,7 +79,7 @@ public class StudenteUIDesigner extends JFrame {
     }
 
     private void update() {
-        Studente s = Storage.getSelected("Studente", new Studente(), Studente.class);
+        Studente s = Storage.getSelected(new Studente(), Studente.class);
         if (s == null) {
             tfId.setText("");
             tfNome.setText("");
