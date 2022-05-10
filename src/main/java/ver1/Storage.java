@@ -8,7 +8,7 @@ import java.nio.file.*;
 import java.sql.*;
 import java.util.*;
 
-public abstract class Storage implements CSVserializable {
+public abstract class Storage {
     private static Map<String, String> create;
     private static Map<String, Map<String, TYPES>> types;
     private static Map<String, ArrayList<String>> forbidden;
@@ -115,7 +115,6 @@ public abstract class Storage implements CSVserializable {
     public abstract @NotNull String getCreateDB();
 
     // CSV
-    @Override
     public @NotNull String toCSV() {
         StringJoiner sj = new StringJoiner(";");
         for (String n : this.Keys()) {
@@ -124,7 +123,6 @@ public abstract class Storage implements CSVserializable {
         return sj.toString();
     }
 
-    @Override
     public <T extends Storage> T FromCSV(@NotNull String csv, @NotNull T template) {
         String name = TYPES.getClassName(this.getClass());
         Field[] fs = template.getClass().getDeclaredFields();
