@@ -3,6 +3,7 @@ package ver1;
 import org.jetbrains.annotations.*;
 
 import java.lang.reflect.*;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -48,10 +49,13 @@ public enum TYPES {
         try {
             String g = String.format("get%s", this.getStr());
             String u = String.format("update%s", this.getStr());
-            this.castFun = this.wrap.getMethod("valueOf", String.class);
-            this.update = ResultSet.class.getMethod(u, String.class, this.getType());
+            if (this.getType() != String.class) {
+                this.castFun = this.wrap.getMethod("valueOf", String.class);
+            }
+            this.update = ResultSet.class.getMethod(u, int.class, this.getType());
             this.get = ResultSet.class.getMethod(g, int.class);
-        } catch (Exception ignored) {
+        } catch (NoSuchMethodException ignored) {
+            System.out.printf("Error! setMethods for (%s) failed...\n", this.getStr());
         }
     }
 

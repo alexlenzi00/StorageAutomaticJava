@@ -81,13 +81,58 @@ public class TestApp {
             Storage.insert("Book", new Book(10, "Title insert", "Storage", 5));
             Storage.insert("Plane", new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
 
-            // GET SELECTED IN DB
+            // STUDENTE GET SELECTED & NEXT
+            System.out.printf("\nTable size for Studente: %d\n", Storage.getSizeOf("Studente"));
             Studente s1 = Storage.getSelected(new Studente(), Studente.class);
-            Book b1 = Storage.getSelected(new Book(), Book.class);
-            Plane p1 = Storage.getSelected(new Plane(), Plane.class);
+            Storage.next("Studente");
+            Studente s2 = Storage.getSelected(new Studente(), Studente.class);
+            Storage.next("Studente");
+            Studente s3 = Storage.getSelected(new Studente(), Studente.class);
+            Storage.next("Studente");
+            Studente s4 = Storage.getSelected(new Studente(), Studente.class);
+            Storage.next("Studente");
+            Studente s5 = Storage.getSelected(new Studente(), Studente.class);
+
             System.out.println("STUDENTE: " + s1);
+            System.out.println("STUDENTE: " + s2);
+            System.out.println("STUDENTE: " + s3);
+            System.out.println("STUDENTE: " + s4);
+            System.out.println("STUDENTE: " + s5);
+
+            // BOOK GET SELECTED & PREVIOUS
+            System.out.printf("\nTable size for Book: %d\n", Storage.getSizeOf("Book"));
+            Storage.last("Book");
+            Book b1 = Storage.getSelected(new Book(), Book.class);
+            Storage.previous("Book");
+            Book b2 = Storage.getSelected(new Book(), Book.class);
+            Storage.previous("Book");
+            Book b3 = Storage.getSelected(new Book(), Book.class);
+            Storage.previous("Book");
+            Book b4 = Storage.getSelected(new Book(), Book.class);
+            Storage.previous("Book");
+            Book b5 = Storage.getSelected(new Book(), Book.class);
+            Storage.previous("Book");
+
             System.out.println("BOOK: " + b1);
-            System.out.println("PLANE: " + p1);
+            System.out.println("BOOK: " + b2);
+            System.out.println("BOOK: " + b3);
+            System.out.println("BOOK: " + b4);
+            System.out.println("BOOK: " + b5);
+
+            // PLANE GET SELECTED & ABSOLUTE
+            System.out.printf("\nTable size for Plane: %d\n", Storage.getSizeOf("Plane"));
+            if (Storage.absolute("Plane", 5)) {
+                Plane p = Storage.getSelected(new Plane(), Plane.class);
+                System.out.println("PLANE: " + p);
+            }
+            if (Storage.absolute("Plane", 50)) {
+                Plane p = Storage.getSelected(new Plane(), Plane.class);
+                System.out.println("PLANE: " + p);
+            }
+            if (Storage.absolute("Plane", 27)) {
+                Plane p = Storage.getSelected(new Plane(), Plane.class);
+                System.out.println("PLANE: " + p);
+            }
         }
     }
 }
