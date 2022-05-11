@@ -3,7 +3,6 @@ package ver1;
 import org.jetbrains.annotations.*;
 
 import java.lang.reflect.*;
-import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -33,15 +32,15 @@ public enum TYPES {
         setMethods();
     }
 
-    public Class<?> getType() {
+    public @NotNull Class<?> getType() {
         return type;
     }
 
-    public Class<?> getWrap() {
+    public @NotNull Class<?> getWrap() {
         return wrap;
     }
 
-    public String getStr() {
+    public @NotNull String getStr() {
         return str;
     }
 
@@ -66,7 +65,7 @@ public enum TYPES {
         return tmp;
     }
 
-    public static TYPES getTYPESByType(Class<?> c) {
+    public static @Nullable TYPES getTYPESByType(@NotNull Class<?> c) {
         TYPES[] ts = TYPES.class.getEnumConstants();
         for (TYPES t : ts) {
             if (t.getType() == c) {
@@ -76,7 +75,7 @@ public enum TYPES {
         return null;
     }
 
-    public static TYPES getTYPESByWrap(Class<?> c) {
+    public static @Nullable TYPES getTYPESByWrap(@NotNull Class<?> c) {
         TYPES[] ts = TYPES.class.getEnumConstants();
         for (TYPES t : ts) {
             if (t.getWrap() == c) {
@@ -86,12 +85,12 @@ public enum TYPES {
         return null;
     }
 
-    public static String howToPrint(Object o, TYPES t) {
+    public static @NotNull String howToPrint(@NotNull Object o, @NotNull TYPES t) {
         String s = t.getWrap().cast(o).toString();
         return (t == STRING || t == DATE) ? ("'" + s + "'") : s;
     }
 
-    public static Object castThis(String str, TYPES t) {
+    public static @Nullable Object castThis(@NotNull String str,@NotNull TYPES t) {
         try {
             if (t == STRING) {
                 return str;
@@ -104,12 +103,12 @@ public enum TYPES {
         }
     }
 
-    public static Method howToUpdate(TYPES t) {
-        return (t != null) ? t.update : null;
+    public static @Nullable Method howToUpdate(@NotNull TYPES t) {
+        return t.update;
     }
 
-    public static Method howToGet(TYPES t) {
-        return (t != null) ? t.get : null;
+    public static Method howToGet(@NotNull TYPES t) {
+        return t.get;
     }
 
     @Override

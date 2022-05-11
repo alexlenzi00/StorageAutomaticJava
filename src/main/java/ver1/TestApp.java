@@ -1,11 +1,7 @@
 package ver1;
 
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class TestApp {
     public static void main(String[] args) {
@@ -19,14 +15,14 @@ public class TestApp {
             System.out.println("INIT: " + lst1);
 
             // SAVE to CSV
-            Studente.saveToCSV(lst1, new Studente(), "students.csv");
+            Studente.saveToCSV(lst1, "students.csv");
 
             // LOAD from CSV
             ArrayList<Studente> students = Storage.loadFromCSV("students.csv", new Studente(), Studente.class);
             System.out.println("CSV: " + students);
 
             // SAVE to DB
-            Storage.saveToDB(lst1, new Studente());
+            Storage.saveToDB(lst1);
 
             // LOAD from DB
             students = Storage.loadFromDB(new Studente(), Studente.class);
@@ -43,14 +39,14 @@ public class TestApp {
             System.out.println("INIT: " + lst2);
 
             // SAVE to CSV
-            Studente.saveToCSV(lst2, new Book(), "books.csv");
+            Studente.saveToCSV(lst2, "books.csv");
 
             // LOAD from CSV
             ArrayList<Book> books = Storage.loadFromCSV("books.csv", new Book(), Book.class);
             System.out.println("CSV: " + books);
 
             // SAVE to DB
-            Storage.saveToDB(lst2, new Book());
+            Storage.saveToDB(lst2);
 
             // LOAD from DB
             books = Storage.loadFromDB(new Book(), Book.class);
@@ -64,10 +60,10 @@ public class TestApp {
             System.out.println("CSV: " + planes);
 
             // SAVE to CSV
-            Studente.saveToCSV(planes, new Plane(), "planes.csv");
+            Studente.saveToCSV(planes, "planes.csv");
 
             // SAVE to DB
-            Storage.saveToDB(planes, new Plane());
+            Storage.saveToDB(planes);
 
             // LISTA OTTENUTA DA DB
             ArrayList<Plane> lst3 = Storage.loadFromDB(new Plane(), Plane.class);
@@ -81,8 +77,9 @@ public class TestApp {
             Storage.insert("Book", new Book(10, "Title insert", "Storage", 5));
             Storage.insert("Plane", new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
 
-            // STUDENTE GET SELECTED & NEXT
+            // STUDENTE GET SELECTED & NEXT & FIRST
             System.out.printf("\nTable size for Studente: %d\n", Storage.getSizeOf("Studente"));
+            Storage.first("Studente");
             Studente s1 = Storage.getSelected(new Studente(), Studente.class);
             Storage.next("Studente");
             Studente s2 = Storage.getSelected(new Studente(), Studente.class);
@@ -90,16 +87,13 @@ public class TestApp {
             Studente s3 = Storage.getSelected(new Studente(), Studente.class);
             Storage.next("Studente");
             Studente s4 = Storage.getSelected(new Studente(), Studente.class);
-            Storage.next("Studente");
-            Studente s5 = Storage.getSelected(new Studente(), Studente.class);
 
             System.out.println("STUDENTE: " + s1);
             System.out.println("STUDENTE: " + s2);
             System.out.println("STUDENTE: " + s3);
             System.out.println("STUDENTE: " + s4);
-            System.out.println("STUDENTE: " + s5);
 
-            // BOOK GET SELECTED & PREVIOUS
+            // BOOK GET SELECTED & PREVIOUS & LAST
             System.out.printf("\nTable size for Book: %d\n", Storage.getSizeOf("Book"));
             Storage.last("Book");
             Book b1 = Storage.getSelected(new Book(), Book.class);
@@ -110,28 +104,25 @@ public class TestApp {
             Storage.previous("Book");
             Book b4 = Storage.getSelected(new Book(), Book.class);
             Storage.previous("Book");
-            Book b5 = Storage.getSelected(new Book(), Book.class);
-            Storage.previous("Book");
 
             System.out.println("BOOK: " + b1);
             System.out.println("BOOK: " + b2);
             System.out.println("BOOK: " + b3);
             System.out.println("BOOK: " + b4);
-            System.out.println("BOOK: " + b5);
 
             // PLANE GET SELECTED & ABSOLUTE
             System.out.printf("\nTable size for Plane: %d\n", Storage.getSizeOf("Plane"));
             if (Storage.absolute("Plane", 5)) {
                 Plane p = Storage.getSelected(new Plane(), Plane.class);
-                System.out.println("PLANE: " + p);
+                System.out.println("PLANE 05: " + p);
             }
             if (Storage.absolute("Plane", 50)) {
                 Plane p = Storage.getSelected(new Plane(), Plane.class);
-                System.out.println("PLANE: " + p);
+                System.out.println("PLANE 50: " + p);
             }
             if (Storage.absolute("Plane", 27)) {
                 Plane p = Storage.getSelected(new Plane(), Plane.class);
-                System.out.println("PLANE: " + p);
+                System.out.println("PLANE 27: " + p);
             }
         }
     }

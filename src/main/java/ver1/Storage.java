@@ -9,11 +9,34 @@ import java.sql.*;
 import java.util.*;
 
 public abstract class Storage {
+    /**
+     * This MAP is used to store all the CREATE_DB query foreach Class extends Storage has at least one instance,
+     * using the Class name as Key and query as Value
+     */
     private static Map<String, String> create;
+    /**
+     * This MAP is used to store all the attributes not forbidden foreach Class extends Storage has at least one
+     * instance, using the Class name as Key and a Map<String, TYPES> as Value, where there is the attribute name as
+     * Key and TYPES as Value
+     */
     private static Map<String, Map<String, TYPES>> types;
+    /**
+     * This MAP is used to store all the forbidden attribute name foreach Class extends Storage has at least one
+     * instance, using the Class name as Key and ArrayList<String> as Value contains all the name forbidden
+     */
     private static Map<String, ArrayList<String>> forbidden;
+    /**
+     * This MAP is used to store all the CREATE_DB query foreach Class extends Storage has at least one instance,
+     * using the Class name as Key and ResulSet as Value
+     */
     private static Map<String, ResultSet> ResultSets;
 
+    /**
+     * Call function 'super()' at start of all Constructors of Class that extends Storage
+     *
+     * @param except A variadic String[] that represent all the names of forbidden attributes, could be null (no
+     * params passed to function)
+     */
     protected Storage(String... except) {
         String name = TYPES.getClassName(this.getClass());
         setForbidden(name, except);
@@ -51,11 +74,22 @@ public abstract class Storage {
         }
     }
 
-    public @NotNull String getCreate(String name) {
+    /**
+     * @param name Classname you want to get 'create DB query', not null required
+     *
+     * @return String representing query to create Table in DB, could be empty string in case there isn't a create
+     * query saved in Storage before calling getCreate
+     */
+    public @NotNull String getCreate(@NotNull String name) {
         return create.getOrDefault(name, "");
     }
 
-    public Object getByName(@NotNull String name) {
+    /**
+     * @param name Name of attribute you want to get from this object, not null required
+     *
+     * @return Object representing the value of the attribute, could be null if attribute name is not present in Object
+     */
+    public @Nullable Object getByName(@NotNull String name) {
         try {
             Field[] fs = this.getClass().getDeclaredFields();
             Object ris = null;
@@ -71,7 +105,16 @@ public abstract class Storage {
         }
     }
 
-    private void setForbidden(String name, String... except) {
+    /**
+     * This function save in private MAP forbidden all the names of attributes are not necessary to be mapped by
+     * Storage for the class where name is specified in the first String passed to this function
+     *
+     * @param name Classname you want to set forbidden names as ArrayList inside the Entry<String,ArrayList<String>>
+     * in private MAP forbidden, not null required
+     * @param except A variadic String[] that represent all the names of forbidden attributes, could be null (no
+     * params passed to function as except)
+     */
+    private void setForbidden(@NotNull String name, String... except) {
         if (forbidden == null) {
             forbidden = new LinkedHashMap<>();
         }
@@ -84,12 +127,24 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * No parameters
+     *
+     * @return String[] representing all the names of attribute mapped in Storage for the class of Object call this
+     * function, never null
+     */
     protected @NotNull String[] Keys() {
         String name = TYPES.getClassName(this.getClass());
         Set<String> k = new LinkedHashSet<>(types.get(name).keySet());
         return k.toArray(new String[0]);
     }
 
+    /**
+     * No parameters
+     *
+     * @return TYPES[] representing all the TYPES of attribute mapped in Storage for the class of Object call this
+     * function, never null
+     */
     protected @NotNull TYPES[] Values() {
         String name = TYPES.getClassName(this.getClass());
         ArrayList<TYPES> v = new ArrayList<>(types.get(name).values());
@@ -109,24 +164,62 @@ public abstract class Storage {
         ris.append("}");
         return ris.toString();
     }
-
     // ABSTRACT METHODS
-    public abstract <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c);
-    public abstract @NotNull String getCreateDB();
 
+    /**
+     * <STRONG>FOLLOW THIS STEPS TO IMPLEMENT CORRECTLY THIS FUNCTION</STRONG>
+     * In case you have a class like Person you need to implement this function:
+     * <STRONG>return c.cast(new Person(this.getAttr1(), this.getAttr2(), ..., this.getAttrN()));</STRONG>
+     *
+     * @param c Is the class of the object you want to 'duplicate' (example you have class Person, you will write
+     * Person.class), not null required
+     *
+     * @return A new Object of T is the copy of the object who called this function
+     */
+    public abstract <T extends Storage> @NotNull T duplicate(@NotNull Class<T> c);
+    /**
+     * FOLLOW THIS STEPS TO IMPLEMENT CORRECTLY THIS FUNCTION
+     * In case you have a class like Person you need to implement this function:
+     * return "CREATE TABLE Person(...);";
+     *
+     * @return String representing query to create Table in DB, never null
+     */
+    public abstract @NotNull String getCreateDB();
     // CSV
-    public @NotNull String toCSV() {
-        StringJoiner sj = new StringJoiner(";");
+
+    /**
+     * @param delimiter String used as delimiter between fields, not null required
+     *
+     * @return String representing all the field ad strings delimited by delimiter, never null
+     */
+    public @NotNull String toCSV(@NotNull String delimiter) {
+        StringJoiner sj = new StringJoiner(delimiter);
         for (String n : this.Keys()) {
-            sj.add(getByName(n).toString());
+            Object value = getByName(n);
+            if (value != null) {
+                sj.add(value.toString());
+            }
         }
         return sj.toString();
     }
 
-    public <T extends Storage> T FromCSV(@NotNull String csv, @NotNull T template) {
+    /**
+     * This function returns a new instance of T that extends Storage using String as input and delimiter to get all
+     * fields, needs template ("Default Constructor of T instance") to set all fields of this and then return
+     * template modified using data between <STRONG>delimiter</STRONG> in String <STRONG>csv</STRONG>
+     *
+     * @param csv String representing the data of T delimited by delimiter passed as 3rd param, not null required
+     * @param template Default Constructor of T instance (example you have class Person, for template you'll
+     * use Person()), not null required
+     * @param delimiter String representing delimiter between fields inside <STRONG>csv</STRONG> String, not null
+     * required
+     *
+     * @return True if template correctly filled using csv data, if an Error occurs returns False
+     */
+    public <T extends Storage> boolean FromCSV(@NotNull String csv, @NotNull T template, @NotNull String delimiter) {
         String name = TYPES.getClassName(this.getClass());
         Field[] fs = template.getClass().getDeclaredFields();
-        String[] values = csv.split(";");
+        String[] values = csv.split(delimiter);
         int i = 0;
         try {
             for (Field f : fs) {
@@ -140,26 +233,49 @@ public abstract class Storage {
                     i++;
                 }
             }
-            return template;
+            return true;
         } catch (IllegalAccessException e) {
-            return null;
+            System.out.printf("Error! FromCSV for (%s) failed...", name);
+            return false;
         }
     }
 
-    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, T template, @NotNull String filename) {
-        String name = TYPES.getClassName(template.getClass());
-        File file = new File(filename);
-        Path path = file.toPath();
-        List<String> lines = new ArrayList<>();
-        for (T data : lst)
-            lines.add(data.toCSV());
-        try {
-            Files.write(path, lines);
-        } catch (IOException e) {
-            System.out.printf("Error! Save to CSV for %s failed\n", name);
+    /**
+     * This function save all ArrayList of T in file where name is specified as 2nd param
+     *
+     * @param lst ArrayList of T representing the elements you want to save in file.csv, not null required
+     * @param filename Filename of the file you want to create/override and insert all csv data of lst, not null
+     * required
+     */
+    public static <T extends Storage> void saveToCSV(@NotNull ArrayList<T> lst, @NotNull String filename) {
+        if (lst.size() > 0) {
+            String name = TYPES.getClassName(lst.get(0).getClass());
+            File file = new File(filename);
+            Path path = file.toPath();
+            List<String> lines = new ArrayList<>();
+            for (T data : lst)
+                lines.add(data.toCSV(";"));
+            try {
+                Files.write(path, lines);
+            } catch (IOException e) {
+                System.out.printf("Error! Save to CSV for %s failed\n", name);
+            }
         }
     }
 
+    /**
+     * This function read all data of csv file where name is specified as 1st param, needs T template (result of
+     * Default constructor to call duplicate function to add one item inside ArrayList of T as result) and Class<T> c
+     * (example you have class Person you will write Person.class)
+     *
+     * @param filename Filename of the file.csv you want to read to get ArrayList of T, not null required
+     * @param template Default Constructor of T instance (example you have class Person, for template you'll use
+     * Person()), not null required
+     * @param c Class<T> used to call duplicate for template (template.duplicate(c)), not null required
+     *
+     * @return ArrayList<T> representing all data readed from the file.csv, never null but could be empty if Error
+     * occurs
+     */
     public static <T extends Storage> @NotNull ArrayList<T> loadFromCSV(@NotNull String filename, @NotNull T template, @NotNull Class<T> c) {
         String name = TYPES.getClassName(template.getClass());
         ArrayList<T> ris = new ArrayList<>();
@@ -169,12 +285,12 @@ public abstract class Storage {
             try {
                 Scanner scanner = new Scanner(path);
                 while (scanner.hasNextLine()) {
-                    // modifico i valori del template per poi duplicarlo e aggiungerlo alla lista lst
-                    template = template.FromCSV(scanner.nextLine(), template);
-                    try {
-                        ris.add(template.duplicate(c));
-                    } catch (Exception ignored) {
-                        System.out.println("Error loadCSV!");
+                    if (template.FromCSV(scanner.nextLine(), template, ";")) {
+                        try {
+                            ris.add(template.duplicate(c));
+                        } catch (Exception ignored) {
+                            System.out.println("Error loadCSV!");
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -185,23 +301,28 @@ public abstract class Storage {
     }
 
     // DB
-    public static <T extends Storage> void saveToDB(@NotNull List<T> lst, @NotNull T template) {
-        String name = TYPES.getClassName(template.getClass());
-        try {
-            Statement statement = DBManager.getStatement();
-            statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
-            statement.executeUpdate(template.getCreate(name));
-            String[] k = template.Keys();
-            TYPES[] v = template.Values();
-            for (T x : lst) {
-                StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
-                for (int i = 0; i < types.get(name).size(); i++) {
-                    sql.add(TYPES.howToPrint(x.getByName(k[i]), v[i]));
+    public static <T extends Storage> void saveToDB(@NotNull List<T> lst) {
+        if (lst.size() > 0) {
+            String name = TYPES.getClassName(lst.get(0).getClass());
+            try {
+                Statement statement = DBManager.getStatement();
+                statement.executeUpdate(String.format("DROP TABLE IF EXISTS %s", name));
+                Storage.create.put(name, lst.get(0).getCreateDB());
+                statement.executeUpdate(Storage.create.get(name));
+                Map<String, TYPES> m = Storage.types.get(name);
+                for (T x : lst) {
+                    StringJoiner sql = new StringJoiner(",", String.format("INSERT INTO %s VALUES (", name), ");");
+                    for (String k : m.keySet()) {
+                        Object value = x.getByName(k);
+                        if (value != null) {
+                            sql.add(TYPES.howToPrint(value, m.get(k)));
+                        }
+                    }
+                    statement.executeUpdate(sql.toString());
                 }
-                statement.executeUpdate(sql.toString());
+            } catch (SQLException e) {
+                System.out.printf("Error! Save to DB for %s failed\n", name);
             }
-        } catch (SQLException e) {
-            System.out.printf("Error! Save to DB for %s failed\n", name);
         }
     }
 

@@ -109,7 +109,7 @@ public class StudenteUIDesigner extends JFrame {
                 try {
                     Statement statement = DBManager.getConnection().createStatement();
                     List<Studente> students = Studente.loadFromCSV(jf.getSelectedFile().getName(), new Studente(), Studente.class);
-                    Studente.saveToDB(students, new Studente());
+                    Studente.saveToDB(students);
                     initData();
                     statement.close();
                 } catch (SQLException ex) {
