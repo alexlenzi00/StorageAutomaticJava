@@ -1,5 +1,6 @@
 package ver1;
 
+import com.mysql.cj.x.protobuf.MysqlxDatatypes;
 import org.jetbrains.annotations.*;
 
 import java.io.*;
@@ -285,7 +286,8 @@ public abstract class Storage {
             try {
                 Scanner scanner = new Scanner(path);
                 while (scanner.hasNextLine()) {
-                    if (template.FromCSV(scanner.nextLine(), template, ";")) {
+                    String line = scanner.nextLine();
+                    if (template.FromCSV(line, template, ";")) {
                         try {
                             ris.add(template.duplicate(c));
                         } catch (Exception ignored) {
@@ -299,8 +301,13 @@ public abstract class Storage {
         }
         return ris;
     }
-
     // DB
+
+    /**
+     * This function saves List of T in DB Table, but first recreate all the Table as new and insert all the elements
+     *
+     * @param lst List of T representing data you want to save in DB
+     */
     public static <T extends Storage> void saveToDB(@NotNull List<T> lst) {
         if (lst.size() > 0) {
             String name = TYPES.getClassName(lst.get(0).getClass());
@@ -326,6 +333,9 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function returns new ArrayList contains all the values from DB of the class T, could be empty
+     */
     public static <T extends Storage> ArrayList<T> loadFromDB(@NotNull T template, @NotNull Class<T> c) {
         String name = TYPES.getClassName(template.getClass());
         ArrayList<T> lst = new ArrayList<>();
@@ -361,7 +371,7 @@ public abstract class Storage {
         return ResultSets.get(name);
     }
 
-    public static <T extends Storage> T getSelected(@NotNull T template, @NotNull Class<T> c) {
+    public static <T extends Storage> @Nullable T getSelected(@NotNull T template, @NotNull Class<T> c) {
         String name = TYPES.getClassName(c);
         try {
             int i = 1;
@@ -393,11 +403,10 @@ public abstract class Storage {
 
     public static <T extends Storage> void insert(@NotNull String name, @NotNull T obj) {
         try {
-            ResultSet rs = Storage.getAll(name);
             Map<String, TYPES> map = Storage.types.get(name);
             Field[] fs = obj.getClass().getDeclaredFields();
-            int index = rs.getRow();
-            rs.moveToInsertRow();
+            int index = ResultSets.get(name).getRow();
+            ResultSets.get(name).moveToInsertRow();
             // ricerca dei vari campi "mappati" in map per il tipo T e utilizzo di updateSelected
             for (Field f : fs) {
                 f.setAccessible(true);
@@ -406,10 +415,18 @@ public abstract class Storage {
                     Storage.updateSelected(name, n, obj.getByName(n));
                 }
             }
-            rs.insertRow();
-            rs.absolute(index);
+            ResultSets.get(name).insertRow();
+            // Storage.updateResultSet(name);
+            ResultSets.get(name).absolute(index);
         } catch (SQLException e) {
             System.out.printf("Error! Insert for (%s) failed...\n", name);
+        }
+    }
+
+    private static void updateResultSet(String name) {
+        try {
+            ResultSets.put(name, DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name)));
+        } catch (SQLException ignored) {
         }
     }
 
