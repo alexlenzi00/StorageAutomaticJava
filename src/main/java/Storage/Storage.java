@@ -361,13 +361,30 @@ public abstract class Storage {
         }
         return lst;
     }
-
     // ResulSet
+
+    /**
+     * This function returns ResultSet of the specified Table if exists in DB
+     *
+     * @param name Table name used to get all entry in DB, not null required
+     *
+     * @return ResultSet of the specified table, never null
+     */
     public static @NotNull ResultSet getAll(@NotNull String name) {
         Storage.updateResultSet(name);
         return ResultSets.get(name);
     }
 
+    /**
+     * This function returns T element from the selected line in ResultSet stored in Storage
+     *
+     * @param template Default Constructor of T instance (example you have class Person, for template you'll use
+     * Person()), not null required
+     * @param c Class<T> used to call duplicate for template (template.duplicate(c)), not null required
+     *
+     * @return T representing data of the current line of Table has named T readed from DB, could be null if Error
+     * occurs
+     */
     public static <T extends Storage> @Nullable T getSelected(@NotNull T template, @NotNull Class<T> c) {
         String name = TYPES.getClassName(c);
         try {
