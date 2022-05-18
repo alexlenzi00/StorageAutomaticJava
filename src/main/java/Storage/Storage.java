@@ -180,7 +180,7 @@ public abstract class Storage {
     /**
      * FOLLOW THIS STEPS TO IMPLEMENT CORRECTLY THIS FUNCTION
      * In case you have a class like Person you need to implement this function:
-     * return "CREATE TABLE Person(...);";
+     * <STRONG>return "CREATE TABLE Person(...);";</STRONG>
      *
      * @return String representing query to create Table in DB, never null
      */
@@ -415,7 +415,13 @@ public abstract class Storage {
         }
     }
 
-    public static <T extends Storage> void insert(@NotNull String name, @NotNull T obj) {
+    /**
+     * This function insert into DB an entry representing all datas of obj passed
+     *
+     * @param obj T representing data you want to add into the DB
+     */
+    public static <T extends Storage> void insert(@NotNull T obj) {
+        String name = TYPES.getClassName(obj.getClass());
         try {
             Map<String, TYPES> map = Storage.types.get(name);
             Field[] fs = obj.getClass().getDeclaredFields();
@@ -437,6 +443,11 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function update ResultSet stored in Storage
+     *
+     * @param name Name of Table you want to refresh stored datas in Storage
+     */
     private static void updateResultSet(String name) {
         try {
             ResultSets.put(name, DBManager.getStatement().executeQuery(String.format("SELECT * FROM %s", name)));
@@ -445,6 +456,11 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function removes the selected item of the Table specified in name param
+     *
+     * @param name Name of Table where you want to remove selected line
+     */
     public static void remove(String name) {
         try {
             ResultSet rs = Storage.getAll(name);
@@ -455,6 +471,11 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function move back selected line of the specified Table in name param
+     *
+     * @param name Name of Table where you want to move back the selected item
+     */
     public static void previous(String name) {
         ResultSet rs = Storage.getAll(name);
         try {
@@ -466,6 +487,11 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function move forward selected line of the specified Table in name param
+     *
+     * @param name Name of Table where you want to move forward the selected item
+     */
     public static void next(String name) {
         ResultSet rs = Storage.getAll(name);
         try {
@@ -477,18 +503,35 @@ public abstract class Storage {
         }
     }
 
+    /**
+     * This function move selected line to the last position available of the specified Table in name param
+     *
+     * @param name Name of Table where you want to move selected item to the last
+     */
     public static void last(String name) {
         if (!absolute(name, getSizeOf(name))) {
             System.out.printf("Error! Last for (%s) failed...\n", name);
         }
     }
 
+    /**
+     * This function move selected line to the first position available of the specified Table in name param
+     *
+     * @param name Name of Table where you want to move selected item to the first
+     */
     public static void first(String name) {
         if (!absolute(name, 1)) {
             System.out.printf("Error! First for (%s) failed...\n", name);
         }
     }
 
+    /**
+     * This function is used to check if there's next item of the specified Table in name param
+     *
+     * @param name Name of Table where you want to check if there's next item available
+     *
+     * @return Returns True if there's at least one element next the selected item, False otherwise
+     */
     public static boolean hasNext(String name) {
         ResultSet rs = Storage.getAll(name);
         boolean ris = false;
@@ -501,6 +544,13 @@ public abstract class Storage {
         return ris;
     }
 
+    /**
+     * This function returns the number of available rows of the specified Table in name param
+     *
+     * @param name Name of Table where you want to know the number of rows
+     *
+     * @return Returns the number of rows in specified Table
+     */
     public static int getSizeOf(String name) {
         int ris = 0;
         ResultSet rs = Storage.getAll(name);
@@ -516,6 +566,15 @@ public abstract class Storage {
         return ris - 1;
     }
 
+    /**
+     * This function returns boolean representing if there's the specified index and if is present move selected item
+     * in specified Table in name param
+     *
+     * @param name Name of Table where you want to move selected item the number of rows
+     * @param index The absolute number of the row you want to move in the Table
+     *
+     * @return Returns True if there's the specified row at index, False otherwise
+     */
     public static boolean absolute(String name, int index) {
         ResultSet rs = getAll(name);
         boolean ris = false;
@@ -530,6 +589,12 @@ public abstract class Storage {
         return ris;
     }
 
+    /**
+     * This function update selected attribute of the selected Table of the selected item in this Table with the value
+     * @param name Name of Table where you want to update selected item
+     * @param attribute Name of attribute you want to update in the selected item
+     * @param value New value you want to set in the specified attribute of the specified Table in name param
+     */
     public static void updateSelected(String name, String attribute, Object value) {
         try {
             ResultSet rs = Storage.getAll(name);

@@ -73,9 +73,9 @@ public class TestApp {
         // AUTOMATIC MODEL
         {
             // INSERT IN DB
-            Storage.insert("Studente", new Studente(10, "Test", "Insert"));
-            Storage.insert("Book", new Book(10, "Title insert", "Storage", 5));
-            Storage.insert("Plane", new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
+            Storage.insert(new Studente(10, "Test", "Insert"));
+            Storage.insert(new Book(10, "Title insert", "Storage", 5));
+            Storage.insert(new Plane("aaaaaa", "Plane name", 1.0, 2.0, Date.valueOf("2020-09-12"), "Automatic"));
 
             // STUDENTE GET SELECTED & NEXT & FIRST
             System.out.printf("\nTable size for Studente: %d\n", Storage.getSizeOf("Studente"));
